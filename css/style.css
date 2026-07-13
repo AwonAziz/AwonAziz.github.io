@@ -1,0 +1,87 @@
+/* file: css/style.css */
+  :root {
+    --clr-primary: #0A1F44;
+    --clr-accent: #0066CC;
+    --clr-bg: #F5F7FA;
+    --clr-text: #1E1E1E;
+    --clr-muted: #6B7280;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Base reset */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    color: var(--clr-text);
+    background: var(--clr-bg);
+  }
+
+  /* ---- Layout primitives ---- */
+   Section { padding: 4rem 1rem; max-width: 1200px; margin: 0 auto; }
+   Section__title { font-size: 2rem; margin-bottom: 1.5rem; text-align: center; }
+   .Grid { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+   .Card { background: #fff; border-radius: .5rem; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+   .Card__title { font-size: 1.25rem; padding: 1rem; }
+   .Card__desc { padding: 0 1rem 0.5rem; color: var(--clr-muted); }
+   .Tag { font-size: .75rem; background: #e5e7eb; color: #374151; padding: .25rem .5rem; border-radius: .25rem;
+  margin-right: .25rem; }
+   .Link { color: var(--clr-accent); text-decoration: none; }
+   .btn { display: inline-block; padding: .75rem 1.5rem; border-radius: .375rem; font-weight: 600; cursor: pointer; }
+   .btn--primary { background: var(--clr-accent); color: #fff; }
+   .btn--secondary { border: 2px solid var(--clr-accent); color: var(--clr-accent); }
+
+   .Nav { position: fixed; top: 0; left: 0; right: 0; padding: .75rem 1rem; background: #fff; box-shadow: 0 1px 4px
+  rgba(0,0,0,.1); z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+   .Nav__logo a { font-weight: 700; color: var(--clr-primary); text-decoration: none; }
+   .Nav__links { display: flex; gap: 2rem; }
+   .Nav__links a { color: var(--clr-primary); text-decoration: none; font-weight: 500; }
+   .Nav__cta { background: var(--clr-accent); color: #fff; border: none; padding: .5rem 1rem; border-radius: .375rem;
+  cursor: pointer; }
+   .Nav__cta:hover { background: var(--clr-primary); }
+
+   .Hero { background: linear-gradient(135deg, #0A1F44 0%, #1E3A8A 100%); color: #fff; min-height: 100vh; display: flex;
+  align-items: center; padding-top: 4rem; }
+   .Hero__content { max-width: 600px; }
+   .Hero__name { font-size: 5rem; margin-bottom: .5rem; }
+   .Hero__tagline { font-size: 1.5rem; margin-bottom: 1rem; opacity: .9; }
+   .Hero__bio { font-size: 1.125rem; margin-bottom: 2rem; max-width: 45ch; }
+   .Hero__actions .btn { margin-right: .75rem; }
+
+   .About { display: flex; flex-direction: flex; align-items: center; gap: 2rem; }
+   .About__avatar { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 4px solid
+  var(--clr-accent); }
+   .About__text { flex: 1; }
+   .Skill-Chip { display: inline-block; background: #e5e7eb; color: #374151; padding: .25rem .5rem; border-radius:
+  .25rem; font-size: .85rem; margin-top: .5rem; }
+
+   .Timeline__item { margin-bottom: 3rem; }
+   .Timeline__role { font-size: 1.25rem; font-weight: 600; color: var(--clr-primary); }
+   .Timeline__company { font-size: 1rem; color: var(--clr-muted); margin-bottom: .5rem; }
+   .Timeline__points { list-style: none; margin-left: 1rem; }
+   .Timeline__points li { margin-bottom: .5rem; }
+
+   .Contact__text a { color: var(--clr-primary); text-decoration: none; }
+
+   .Footer { text-align: center; padding: 2rem 1rem; background: #fff; color: var(--clr-muted); font-size: .9rem;
+  border-top: 1px solid #e5e7eb; }
+   .Footer a { color: var(--clr-primary); text-decoration: none; }
+
+  /* ---- Small utilities ---- */
+   .nav-open { overflow: hidden; }
+   @media (max-width: 768px) {
+     .Nav__links { display: none; flex-direction: column; background: #fff; position: absolute; top: 100%; left: 0;
+  right: 0; padding: 1rem; }
+     .Nav__links.show { display: flex; }
+     .Nav__cta { width: 100%; text-align: center; margin-top: 1rem; }
+     .Hero__name { font-size: 3rem; }
+     .About { flex-direction: column; text-align: center; }
+     .About__avatar { margin: 0 auto; }
+   }
