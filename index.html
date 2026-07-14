@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Awon Aziz — ML & AIOps Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:            #0A0E1A;
+  --bg-card:       #111827;
+  --bg-card2:      #0F172A;
+  --bg-card3:      #0D1425;
+  --accent:        #00D4FF;
+  --accent2:       #A78BFA;
+  --accent-dim:    rgba(0,212,255,0.12);
+  --accent2-dim:   rgba(167,139,250,0.12);
+  --accent-glow:   rgba(0,212,255,0.22);
+  --text:          #E8EEFF;
+  --text-muted:    #7B8DB0;
+  --text-dim:      #3D4F72;
+  --border:        rgba(0,212,255,0.14);
+  --border-subtle: rgba(255,255,255,0.06);
+  --green:         #00FF88;
+  --purple:        #A78BFA;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5%; height: 60px;
+  background: rgba(10,14,26,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.nav-logo {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 18px; letter-spacing: -0.5px;
+  color: var(--text); text-decoration: none;
+}
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-size: 14px; color: var(--text-muted);
+  text-decoration: none; letter-spacing: 0.02em; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+/* HERO */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; padding: 100px 5% 60px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -200px; right: -200px;
+  width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,212,255,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -100px; left: -100px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,139,250,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* scrolling code ticker */
+.code-ticker {
+  position: absolute; top: 0; right: 0; width: 38%; height: 100%;
+  overflow: hidden; pointer-events: none; opacity: 0.045;
+  mask-image: linear-gradient(to left, black 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to left, black 0%, transparent 100%);
+}
+.code-ticker-inner {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--accent); line-height: 1.8; white-space: pre;
+  animation: ticker-scroll 28s linear infinite;
+}
+@keyframes ticker-scroll { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
+
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.75rem;
+}
+.hero-eyebrow::before { content: '▶'; font-size: 10px; }
+
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 700; line-height: 1.05; letter-spacing: -2px;
+  margin-bottom: 1.5rem; max-width: 850px;
+}
+.hero h1 .line2 { color: var(--accent); }
+
+.hero-desc {
+  font-size: 18px; color: var(--text-muted);
+  max-width: 560px; line-height: 1.7; margin-bottom: 2.5rem;
+}
+.hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 4rem; }
+
+.btn-primary {
+  padding: 12px 28px; background: var(--accent); color: #0A0E1A;
+  border-radius: 6px; text-decoration: none; font-weight: 600;
+  font-size: 14px; letter-spacing: 0.02em;
+  transition: opacity 0.2s, transform 0.15s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.btn-ghost {
+  padding: 12px 28px; border: 1px solid var(--border);
+  color: var(--text-muted); border-radius: 6px; text-decoration: none;
+  font-weight: 500; font-size: 14px; letter-spacing: 0.02em;
+  transition: border-color 0.2s, color 0.2s, transform 0.15s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+/* STATS BAR */
+.stats-bar {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px; background: var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px; overflow: hidden; max-width: 860px;
+}
+.stat-item { background: var(--bg-card); padding: 18px 22px; }
+.stat-num {
+  font-family: 'Space Grotesk', sans-serif; font-size: 2rem;
+  font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 4px;
+}
+.stat-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* SECTIONS */
+.section { padding: 80px 5%; }
+.section-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.16em; color: var(--accent);
+  text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 700; letter-spacing: -1px; line-height: 1.1;
+  margin-bottom: 1rem; color: var(--text);
+}
+.section-title .accent  { color: var(--accent); }
+.section-title .accent2 { color: var(--accent2); }
+.section-sub { font-size: 16px; color: var(--text-muted); max-width: 520px; margin-bottom: 3rem; }
+
+/* DUAL FLAGSHIP */
+.flagship-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+.flagship-card {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: 14px; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: border-color 0.2s, transform 0.2s; position: relative;
+}
+.flagship-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; transition: opacity 0.2s;
+}
+.flagship-card.p1::before { background: var(--accent); opacity: 1; }
+.flagship-card.p2::before { background: var(--accent2); opacity: 1; }
+.flagship-card:hover { transform: translateY(-3px); }
+.flagship-card.p1:hover { border-color: rgba(0,212,255,0.22); }
+.flagship-card.p2:hover { border-color: rgba(167,139,250,0.22); }
+
+.flagship-top { padding: 1.75rem 1.75rem 1.25rem; display: flex; flex-direction: column; flex: 1; }
+.flagship-bottom { background: var(--bg-card2); border-top: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem 1.5rem; }
+
+/* CONNECT STRIP */
+.connect-strip {
+  background: var(--bg-card3); border: 1px solid var(--border-subtle);
+  border-radius: 10px; padding: 1.1rem 1.75rem; margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 1.25rem; overflow-x: auto;
+}
+.connect-node { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.connect-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.connect-dot.c1  { background: var(--accent);  box-shadow: 0 0 6px var(--accent); }
+.connect-dot.c2  { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+.connect-dot.shared { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.connect-label { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.connect-arrow { font-size: 13px; color: var(--text-dim); margin: 0 4px; flex-shrink: 0; }
+.connect-pill { font-size: 11px; padding: 2px 9px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; }
+.connect-pill.c1 { background: var(--accent-dim);  color: var(--accent); }
+.connect-pill.c2 { background: var(--accent2-dim); color: var(--accent2); }
+.connect-strip-label { font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; margin-right: 0.5rem; }
+
+/* PROJECT CARDS */
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; }
+.project-card {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: 12px; padding: 1.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative; overflow: hidden; display: flex; flex-direction: column;
+}
+.project-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: var(--accent); opacity: 0; transition: opacity 0.2s;
+}
+.project-card:hover { border-color: var(--border); transform: translateY(-3px); }
+.project-card:hover::before { opacity: 1; }
+
+.project-tag {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.12em; color: var(--accent);
+  text-transform: uppercase; background: var(--accent-dim);
+  padding: 3px 10px; border-radius: 4px; margin-bottom: 0.85rem;
+}
+.project-tag.t2 { color: var(--accent2); background: var(--accent2-dim); }
+
+.project-title {
+  font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem;
+  font-weight: 600; color: var(--text); margin-bottom: 0.65rem;
+  letter-spacing: -0.3px; line-height: 1.3;
+}
+.project-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; flex: 1; margin-bottom: 1.1rem; }
+.tech-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.1rem; }
+.pill {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--text-muted); background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-subtle); border-radius: 4px; padding: 3px 9px;
+}
+.project-link {
+  font-size: 13px; color: var(--accent); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  letter-spacing: 0.02em; margin-top: auto; transition: gap 0.2s;
+}
+.project-link:hover { gap: 10px; }
+.project-link.l2 { color: var(--accent2); }
+
+/* METRIC BARS */
+.metric-row { display: flex; flex-direction: column; gap: 0.85rem; }
+.metric-item { display: flex; align-items: center; gap: 0.85rem; }
+.metric-bar-wrap { flex: 1; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.metric-bar-fill { height: 100%; border-radius: 2px; transition: width 1.3s ease; }
+.metric-bar-fill.c1 { background: var(--accent); }
+.metric-bar-fill.c2 { background: var(--accent2); }
+.metric-label { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; min-width: 130px; }
+.metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; min-width: 38px; text-align: right; }
+.metric-val.c1 { color: var(--accent); }
+.metric-val.c2 { color: var(--accent2); }
+
+/* SKILLS */
+.skills-section { padding: 80px 5%; }
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.1rem; }
+.skill-group {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: 12px; padding: 1.35rem; transition: border-color 0.2s;
+}
+.skill-group:hover { border-color: rgba(0,212,255,0.12); }
+.skill-group-title {
+  font-family: 'Space Grotesk', sans-serif; font-size: 13.5px;
+  font-weight: 600; color: var(--text); margin-bottom: 0.9rem;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.skill-group-icon {
+  width: 28px; height: 28px; background: var(--accent-dim);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.skill-group-icon.i2 { background: var(--accent2-dim); }
+.skill-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.skill-tag {
+  font-size: 11.5px; color: var(--text-muted);
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle);
+  border-radius: 20px; padding: 4px 11px; transition: border-color 0.2s, color 0.2s;
+}
+.skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ABOUT */
+.about-section {
+  padding: 80px 5%; display: grid; grid-template-columns: 1fr 1fr;
+  gap: 5rem; align-items: start;
+}
+.about-text p { color: var(--text-muted); line-height: 1.8; margin-bottom: 1.25rem; font-size: 15.5px; }
+.certs-list { display: flex; flex-direction: column; gap: 0.65rem; }
+.cert-item {
+  display: flex; align-items: flex-start; gap: 1rem;
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: 8px; padding: 0.9rem 1.1rem; transition: border-color 0.2s;
+}
+.cert-item:hover { border-color: rgba(0,212,255,0.14); }
+.cert-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-top: 5px; flex-shrink: 0; }
+.cert-name { font-size: 13.5px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.cert-org  { font-size: 12px; color: var(--text-muted); }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border-subtle); padding: 3rem 5%;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 1.5rem;
+}
+.footer-name { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+.footer-name span { color: var(--accent); }
+.footer-links { display: flex; gap: 1.5rem; list-style: none; }
+.footer-links a { font-size: 14px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--accent); }
+.footer-copy { font-size: 13px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+/* TERMINAL */
+#typed-output { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--green); }
+.cursor { display: inline-block; width: 2px; height: 1em; background: var(--green); vertical-align: text-bottom; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border-subtle); margin: 0 5%; }
+
+/* FADE IN */
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* HERO GRID */
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(0,212,255,0.07) 1px, transparent 1px);
+  background-size: 36px 36px; pointer-events: none;
+  mask-image: radial-gradient(ellipse 80% 60% at 80% 30%, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 80% 30%, black 0%, transparent 70%);
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .flagship-grid { grid-template-columns: 1fr; }
+  .connect-strip { display: none; }
+}
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2.5rem; letter-spacing: -1px; }
+  .nav-links { display: none; }
+  .about-section { grid-template-columns: 1fr; gap: 3rem; }
+  footer { flex-direction: column; align-items: flex-start; }
+  .code-ticker { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-in { opacity: 1; transform: none; transition: none; }
+  .cursor { animation: none; }
+  .code-ticker-inner { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">awon<span>.</span>dev</a>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid" aria-hidden="true"></div>
+
+  <div class="code-ticker" aria-hidden="true">
+    <div class="code-ticker-inner">
+detector = IsolationForest(contamination=0.05)
+detector.fit(baseline_metrics)
+report = drift_detector.detect(current_df)
+if report.severity == "severe":
+    trigger_retrain()
+mlflow.set_experiment("ml-lifecycle-platform")
+with mlflow.start_run():
+    mlflow.log_metric("f1", result.f1)
+    mlflow.log_metric("auc", result.auc)
+kubectl apply -f production.yaml
+incident = triage_engine.triage(metric, violations)
+router.notify(incident)
+pipeline = build_feature_pipeline()
+X_train_t = pipeline.fit_transform(X_train)
+clf.fit(X_train_t, y_train)
+psi = compute_psi(reference, current)
+if psi > PSI_THRESHOLD:
+    alert("Drift detected — retraining...")
+docker build -t ml-api:latest .
+uvicorn src.api.server:app --port 8000
+streamlit run dashboard/app.py
+terraform apply -auto-approve
+ansible-playbook deploy.yml
+detector = IsolationForest(contamination=0.05)
+detector.fit(baseline_metrics)
+report = drift_detector.detect(current_df)
+if report.severity == "severe":
+    trigger_retrain()
+mlflow.set_experiment("ml-lifecycle-platform")
+with mlflow.start_run():
+    mlflow.log_metric("f1", result.f1)
+kubectl apply -f production.yaml
+incident = triage_engine.triage(metric, violations)
+router.notify(incident)
+pipeline = build_feature_pipeline()
+X_train_t = pipeline.fit_transform(X_train)
+psi = compute_psi(reference, current)
+docker build -t ml-api:latest .
+uvicorn src.api.server:app --port 8000
+    </div>
+  </div>
+
+  <div class="hero-eyebrow">
+    <span id="typed-output"></span><span class="cursor"></span>
+  </div>
+
+  <h1>
+    Machine Learning<br />
+    &amp; <span class="line2">AIOps Engineer</span>
+  </h1>
+
+  <p class="hero-desc">
+    Building AI systems that keep infrastructure intelligent and self-healing — detecting anomalies, tracking model drift, and automating the full MLOps lifecycle across AWS, Azure, and GCP.
+  </p>
+
+  <div class="hero-cta">
+    <a href="#projects" class="btn-primary">View Projects →</a>
+    <a href="https://www.linkedin.com/in/awonaziz/" target="_blank" rel="noopener" class="btn-ghost">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      LinkedIn
+    </a>
+    <a href="https://github.com/AwonAziz" target="_blank" rel="noopener" class="btn-ghost">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+      GitHub
+    </a>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num" data-target="2" data-suffix="">0</div>
+      <div class="stat-label">Flagship Projects</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" data-target="50" data-suffix="%">0</div>
+      <div class="stat-label">Response Time ↓</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" data-target="87" data-suffix="%">0</div>
+      <div class="stat-label">Detection Precision</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" data-target="3" data-suffix="">0</div>
+      <div class="stat-label">Cloud Platforms</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" data-target="3" data-suffix="">0</div>
+      <div class="stat-label">CI/CD Pipelines</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROJECTS -->
+<section class="section" id="projects">
+  <div class="section-label">// featured work</div>
+  <h2 class="section-title">Projects &amp; <span class="accent">Repositories</span></h2>
+  <p class="section-sub">Two production-grade ML systems covering the full AIOps + MLOps lifecycle — from infra anomaly detection to model drift and auto-retraining.</p>
+
+  <!-- DUAL FLAGSHIP -->
+  <div class="flagship-grid fade-in">
+
+    <!-- Project 1 -->
+    <div class="flagship-card p1">
+      <div class="flagship-top">
+        <span class="project-tag">⭐ Flagship · AIOps</span>
+        <h3 class="project-title" style="font-size:1.22rem;margin-top:0.5rem;">AI-Powered Incident Response System</h3>
+        <p class="project-desc">
+          Multi-cloud AIOps platform for real-time infrastructure anomaly detection across AWS, Azure, and GCP. Hybrid Isolation Forest + rule engine, automated severity triage, Slack/PagerDuty notification routing, and a live Rich terminal dashboard. 31 unit tests.
+        </p>
+        <div class="tech-pills">
+          <span class="pill">Python</span>
+          <span class="pill">Scikit-Learn</span>
+          <span class="pill">Isolation Forest</span>
+          <span class="pill">Prometheus</span>
+          <span class="pill">Grafana</span>
+          <span class="pill">Docker</span>
+          <span class="pill">Kubernetes</span>
+          <span class="pill">Terraform</span>
+        </div>
+        <a href="https://github.com/AwonAziz/ai-incident-response-system" target="_blank" rel="noopener" class="project-link">View Repository →</a>
+      </div>
+      <div class="flagship-bottom">
+        <p style="font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;font-family:'JetBrains Mono',monospace;">Performance Metrics</p>
+        <div class="metric-row">
+          <div class="metric-item">
+            <span class="metric-label">Response time reduction</span>
+            <div class="metric-bar-wrap"><div class="metric-bar-fill c1" data-width="50" style="width:0%"></div></div>
+            <span class="metric-val c1">50%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Operational efficiency</span>
+            <div class="metric-bar-wrap"><div class="metric-bar-fill c1" data-width="20" style="width:0%"></div></div>
+            <span class="metric-val c1">+20%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Deployment cycles</span>
+            <div class="metric-bar-wrap"><div class="metric-bar-fill c1" data-width="30" style="width:0%"></div></div>
+            <span class="metric-val c1">30% ↓</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Model accuracy gain</span>
+            <div class="metric-bar-wrap"><div class="metric-bar-fill c1" data-width="15" style="width:0%"></div></div>
+            <span class="metric-val c1">+15%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project 2 -->
+    <div class="flagship-card p2">
+      <div class="flagship-top">
+        <span class="project-tag t2">⭐ Flagship · MLOps</span>
+        <h3 class="project-title" style="font-size:1.22rem;margin-top:0.5rem;">ML Model Lifecycle &amp; Drift Detection Platform</h3>
+        <p class="project-desc">
+          End-to-end MLOps platform with MLflow experiment tracking, PSI/KS/JS drift detection, FastAPI prediction serving, GitHub Actions CI/CD that auto-triggers retraining on drift, and a live Streamlit health dashboard. 34 unit tests.
+        </p>
+        <div class="tech-pills">
+          <span class="pill">Python</span>
+          <span class="pill">MLflow</span>
+          <span class="pill">FastAPI</span>
+          <span class="pill">Streamlit</span>
+          <span class="pill">XGBoost</span>
+          <span class="pill">GitHub Actions</span>
+          <span class="pill">Docker</span>
+          <span class="pill">SciPy</span>
+        </div>
+        <a href="https://github.com/AwonAziz/ml-lifecycle-platform" target="_blank" rel="noopener" class="project-link l2">View Repository →</a>
+      </div>
+      <div class="flagship-bottom" style="border-top-color:rgba(167,139,250,0.12);">
+        <p style="font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;font-family:'JetBrains Mono',monospace;">Performance Metrics</p>
+        <div class="metric-row">
+          <div class="metric-item">
+            <span class="metric-label">F1 score (champion)</span>
+            <div class="metric-bar-wrap"><div class="metric-bar-fill c2" data-width="87" style="width:0%"></div></div>
+            <span class="metric-val c2">0.87</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">AUC-ROC</span>
+            <div class="metric-bar-wrap"><div class="metric-bar-fill c2" data-width="94" style="width:0%"></div></div>
+            <span class="metric-val c2">0.94</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">API latency (p99)</span>
+            <div class="metric-bar-wrap"><div class="metric-bar-fill c2" data-width="5" style="width:0%"></div></div>
+            <span class="metric-val c2">&lt;5ms</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">CI/CD pipeline time</span>
+            <div class="metric-bar-wrap"><div class="metric-bar-fill c2" data-width="20" style="width:0%"></div></div>
+            <span class="metric-val c2">~2 min</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW THEY CONNECT -->
+  <div class="connect-strip fade-in" aria-label="How the two flagship projects connect">
+    <span class="connect-strip-label">How they connect</span>
+    <div class="connect-node">
+      <span class="connect-dot c1"></span>
+      <span class="connect-label">Infra anomaly detected</span>
+      <span class="connect-pill c1">Project 1</span>
+    </div>
+    <span class="connect-arrow">→</span>
+    <div class="connect-node">
+      <span class="connect-dot shared"></span>
+      <span class="connect-label">Alert routed + triaged</span>
+    </div>
+    <span class="connect-arrow">→</span>
+    <div class="connect-node">
+      <span class="connect-dot c2"></span>
+      <span class="connect-label">Model drift detected</span>
+      <span class="connect-pill c2">Project 2</span>
+    </div>
+    <span class="connect-arrow">→</span>
+    <div class="connect-node">
+      <span class="connect-dot shared"></span>
+      <span class="connect-label">Auto-retrain via CI/CD</span>
+    </div>
+    <span class="connect-arrow">→</span>
+    <div class="connect-node">
+      <span class="connect-dot c2"></span>
+      <span class="connect-label">Champion promoted if better</span>
+      <span class="connect-pill c2">MLflow registry</span>
+    </div>
+  </div>
+
+  <!-- OTHER REPOS -->
+  <div class="projects-grid">
+
+    <div class="project-card fade-in">
+      <span class="project-tag">DevOps</span>
+      <h3 class="project-title">DevOps CI/CD Labs</h3>
+      <p class="project-desc">Hands-on CI/CD and DevOps tooling — Jenkins, Argo CD, Buildkite, Docker, Helm, Kubernetes, Prometheus, and Terraform practised in real cloud lab environments.</p>
+      <div class="tech-pills">
+        <span class="pill">Jenkins</span><span class="pill">Argo CD</span>
+        <span class="pill">Docker</span><span class="pill">Kubernetes</span>
+        <span class="pill">Helm</span><span class="pill">Terraform</span>
+      </div>
+      <a href="https://github.com/AwonAziz/Devops-CICD-labs" target="_blank" rel="noopener" class="project-link">View Repository →</a>
+    </div>
+
+    <div class="project-card fade-in">
+      <span class="project-tag">Linux &amp; Infra</span>
+      <h3 class="project-title">RedHat Linux Labs</h3>
+      <p class="project-desc">Essential Linux administration, shell scripting, and infrastructure tooling practised in Al Nafi cloud labs — real operational and system management workflows.</p>
+      <div class="tech-pills">
+        <span class="pill">RedHat Linux</span><span class="pill">Bash</span>
+        <span class="pill">Shell Scripting</span><span class="pill">Cloud Labs</span>
+      </div>
+      <a href="https://github.com/AwonAziz/RedHat-Linux-Labs" target="_blank" rel="noopener" class="project-link">View Repository →</a>
+    </div>
+
+    <div class="project-card fade-in">
+      <span class="project-tag">Security</span>
+      <h3 class="project-title">Cybersecurity Labs</h3>
+      <p class="project-desc">Practical cybersecurity across network security, threat analysis, and defensive techniques. Certified through Cisco Networking Academy's curriculum.</p>
+      <div class="tech-pills">
+        <span class="pill">Network Security</span><span class="pill">Bash</span>
+        <span class="pill">Cisco Tools</span><span class="pill">Threat Detection</span>
+      </div>
+      <a href="https://github.com/AwonAziz/Cybersecurity-labs" target="_blank" rel="noopener" class="project-link">View Repository →</a>
+    </div>
+
+    <div class="project-card fade-in">
+      <span class="project-tag">Creative Code</span>
+      <h3 class="project-title">Music Visualizer</h3>
+      <p class="project-desc">Browser-based audio visualiser built in HTML/JavaScript — reacts to music in real time using the Web Audio API and Canvas.</p>
+      <div class="tech-pills">
+        <span class="pill">HTML</span><span class="pill">JavaScript</span>
+        <span class="pill">Web Audio API</span><span class="pill">Canvas</span>
+      </div>
+      <a href="https://github.com/AwonAziz/music-visualizer" target="_blank" rel="noopener" class="project-link">View Repository →</a>
+    </div>
+
+    <div class="project-card fade-in">
+      <span class="project-tag">3D / WebGL</span>
+      <h3 class="project-title">Crossy Roads in Three.js</h3>
+      <p class="project-desc">Browser-playable Crossy Roads clone in Three.js — demonstrates 3D scene management, game loop logic, and WebGL rendering entirely in the browser.</p>
+      <div class="tech-pills">
+        <span class="pill">Three.js</span><span class="pill">JavaScript</span><span class="pill">WebGL</span>
+      </div>
+      <a href="https://github.com/AwonAziz/Silly-crossy-roads-game-in-three.js" target="_blank" rel="noopener" class="project-link">View Repository →</a>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section class="skills-section" id="skills">
+  <div class="section-label">// capabilities</div>
+  <h2 class="section-title">Technical <span class="accent">Skills</span></h2>
+  <p class="section-sub">Full-stack ML/AIOps toolkit built through production project work and hands-on cloud lab practice.</p>
+
+  <div class="skills-grid">
+
+    <div class="skill-group fade-in">
+      <div class="skill-group-title"><div class="skill-group-icon">🧠</div>ML &amp; AI</div>
+      <div class="skill-tags">
+        <span class="skill-tag">TensorFlow</span><span class="skill-tag">PyTorch</span>
+        <span class="skill-tag">Scikit-Learn</span><span class="skill-tag">XGBoost</span>
+        <span class="skill-tag">Keras</span><span class="skill-tag">NLP</span>
+        <span class="skill-tag">Computer Vision</span><span class="skill-tag">Isolation Forest</span>
+        <span class="skill-tag">ONNX</span>
+      </div>
+    </div>
+
+    <div class="skill-group fade-in">
+      <div class="skill-group-title"><div class="skill-group-icon i2">🔄</div>MLOps &amp; Experiment Tracking</div>
+      <div class="skill-tags">
+        <span class="skill-tag">MLflow</span><span class="skill-tag">Model Monitoring</span>
+        <span class="skill-tag">Drift Detection</span><span class="skill-tag">FastAPI</span>
+        <span class="skill-tag">Streamlit</span><span class="skill-tag">GitHub Actions</span>
+        <span class="skill-tag">TF Serving</span><span class="skill-tag">Feature Engineering</span>
+      </div>
+    </div>
+
+    <div class="skill-group fade-in">
+      <div class="skill-group-title"><div class="skill-group-icon">☁️</div>Cloud Platforms</div>
+      <div class="skill-tags">
+        <span class="skill-tag">AWS EC2</span><span class="skill-tag">SageMaker</span>
+        <span class="skill-tag">Lambda</span><span class="skill-tag">S3</span>
+        <span class="skill-tag">Azure AKS</span><span class="skill-tag">Azure ML</span>
+        <span class="skill-tag">GCP GKE</span><span class="skill-tag">AI Platform</span>
+      </div>
+    </div>
+
+    <div class="skill-group fade-in">
+      <div class="skill-group-title"><div class="skill-group-icon">⚙️</div>DevOps &amp; CI/CD</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Docker</span><span class="skill-tag">Kubernetes</span>
+        <span class="skill-tag">Jenkins</span><span class="skill-tag">Argo CD</span>
+        <span class="skill-tag">GitLab CI/CD</span><span class="skill-tag">Helm</span>
+        <span class="skill-tag">Terraform</span><span class="skill-tag">Ansible</span>
+      </div>
+    </div>
+
+    <div class="skill-group fade-in">
+      <div class="skill-group-title"><div class="skill-group-icon">📊</div>Monitoring &amp; Data</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Prometheus</span><span class="skill-tag">Grafana</span>
+        <span class="skill-tag">ELK Stack</span><span class="skill-tag">Splunk</span>
+        <span class="skill-tag">Pandas</span><span class="skill-tag">NumPy</span>
+        <span class="skill-tag">SciPy</span><span class="skill-tag">Spark</span>
+      </div>
+    </div>
+
+    <div class="skill-group fade-in">
+      <div class="skill-group-title"><div class="skill-group-icon">💻</div>Programming</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Python</span><span class="skill-tag">Bash</span>
+        <span class="skill-tag">PowerShell</span><span class="skill-tag">Shell Scripting</span>
+        <span class="skill-tag">JavaScript</span><span class="skill-tag">HTML/CSS</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="about-text fade-in">
+    <div class="section-label">// background</div>
+    <h2 class="section-title">About <span class="accent">Me</span></h2>
+    <p>I'm Awon Aziz, a Machine Learning &amp; AIOps Engineer based in Rawalpindi, Pakistan. I design and deploy AI-driven systems across multi-cloud environments — systems that don't just run, but adapt, monitor themselves, and recover automatically.</p>
+    <p>My focus is the full MLOps lifecycle: data pipelines, model training and deployment, real-time anomaly detection, drift monitoring, and automated retraining. I'm especially drawn to the intersection of AI and infrastructure — where machine intelligence makes systems more resilient.</p>
+    <p>Outside of production work I build things that interest me: music visualisers, 3D browser games, and generative experiments. Always learning — currently exploring LLM deployment patterns and model serving at scale.</p>
+    <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;">
+      <a href="mailto:awonaziz786@gmail.com" class="btn-primary">Get in Touch →</a>
+      <a href="https://github.com/AwonAziz" target="_blank" rel="noopener" class="btn-ghost">GitHub Profile</a>
+    </div>
+  </div>
+
+  <div class="fade-in">
+    <div class="section-label" style="margin-bottom:1.5rem;">// credentials</div>
+    <div class="certs-list">
+      <div class="cert-item">
+        <div class="cert-dot"></div>
+        <div><div class="cert-name">Diploma in Artificial Intelligence &amp; Operations — RQF Level 6</div><div class="cert-org">Al Nafi International Colleges</div></div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-dot"></div>
+        <div><div class="cert-name">Machine Learning Certification</div><div class="cert-org">Al Nafi International Colleges</div></div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-dot"></div>
+        <div><div class="cert-name">Networking Essentials</div><div class="cert-org">Cisco Networking Academy</div></div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-dot"></div>
+        <div><div class="cert-name">Introduction to Cybersecurity</div><div class="cert-org">Cisco Networking Academy</div></div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-dot"></div>
+        <div><div class="cert-name">ICS — Computer Science</div><div class="cert-org">IMCB F-8/4</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div>
+    <div class="footer-name">awon<span>.</span>dev</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-top:6px;">awonaziz786@gmail.com</p>
+  </div>
+  <ul class="footer-links">
+    <li><a href="https://github.com/AwonAziz" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://www.linkedin.com/in/awonaziz/" target="_blank" rel="noopener">LinkedIn</a></li>
+    <li><a href="https://leetcode.com/AwonAziz" target="_blank" rel="noopener">LeetCode</a></li>
+    <li><a href="mailto:awonaziz786@gmail.com">Email</a></li>
+  </ul>
+  <span class="footer-copy">© 2026 Awon Aziz</span>
+</footer>
+
+<script>
+  // Terminal typing
+  const phrases = [
+    'ml_engineer.init()',
+    'detecting_anomalies --cloud=aws,azure,gcp',
+    'drift_detector.detect(current_df)',
+    'mlflow.log_metric("f1", result.f1)',
+    'kubectl apply -f production.yaml',
+    'trigger_retrain_pipeline()',
+  ];
+  let pi = 0, ci = 0, deleting = false;
+  const el = document.getElementById('typed-output');
+  function type() {
+    const cur = phrases[pi];
+    if (!deleting) {
+      el.textContent = cur.slice(0, ++ci);
+      if (ci === cur.length) { deleting = true; setTimeout(type, 1800); return; }
+    } else {
+      el.textContent = cur.slice(0, --ci);
+      if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; setTimeout(type, 400); return; }
+    }
+    setTimeout(type, deleting ? 38 : 62);
+  }
+  type();
+
+  // Counter animation
+  function animateCounter(el) {
+    const target = parseInt(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    let current = 0;
+    const steps = 40;
+    const step = target / steps;
+    const iv = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = Math.round(current) + suffix;
+      if (current >= target) clearInterval(iv);
+    }, 900 / steps);
+  }
+
+  // Intersection observer — fade-ins + metric bars
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        entry.target.querySelectorAll('.metric-bar-fill').forEach(bar => {
+          setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 350);
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Stats counter observer
+  const statsObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('.stat-num').forEach(animateCounter);
+        statsObs.disconnect();
+      }
+    });
+  }, { threshold: 0.5 });
+  const statsBar = document.querySelector('.stats-bar');
+  if (statsBar) statsObs.observe(statsBar);
+</script>
+</body>
+</html>
