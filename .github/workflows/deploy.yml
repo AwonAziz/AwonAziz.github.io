@@ -60,10 +60,13 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Absolute origin for canonical/OG/JSON-LD. Set the repository
-          # variable in Settings → Secrets and variables → Actions, or override
-          # VITE_SITE_URL directly here.
-          VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
+          # Canonical origin for the canonical link and the OG/JSON-LD payload.
+          #
+          # The `||` fallback is load-bearing. An unset Actions repository
+          # variable is passed through as an empty string rather than being
+          # omitted, and an empty string is not a valid URL — the content schema
+          # rejects it and the deployed page dies on a ZodError.
+          VITE_SITE_URL: ${{ vars.VITE_SITE_URL || 'https://awonaziz.github.io' }}
 
       - uses: actions/configure-pages@v5
         id: pages

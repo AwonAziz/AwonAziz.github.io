@@ -1,5 +1,21 @@
 import { type SiteConfig, validateSite } from "./schema";
 
+/**
+ * Reads a build-time env var, treating an *empty* value as absent.
+ *
+ * This is not defensive pedantry — it is a bug this project actually shipped.
+ * GitHub Actions passes an unset repository variable through as `""`, not as
+ * undefined, so `import.meta.env.VITE_SITE_URL ?? fallback` let the empty
+ * string straight through to `z.url()`, which rejected it. The whole page died
+ * on a ZodError in production while passing every local check.
+ *
+ * `||` rather than `??` is the whole fix.
+ */
+function env(name: string, fallback: string): string {
+  const value = import.meta.env[name];
+  return typeof value === "string" && value.trim() !== "" ? value.trim() : fallback;
+}
+
 export type {
   ArchiveEntry,
   Credential,
@@ -24,7 +40,7 @@ export const site = validateSite({
     role: "AI / MLOps engineer",
     description:
       "Entry-level AI and MLOps engineer. Data-drift detection, champion/challenger promotion, agentic incident root-cause analysis with an evaluation harness, and scheduled automation that keeps working unattended.",
-    url: import.meta.env.VITE_SITE_URL ?? "https://awonaziz.github.io",
+    url: env("VITE_SITE_URL", "https://awonaziz.github.io"),
     location: "Rawalpindi, Pakistan",
     email: "awonaziz786@gmail.com",
   },
