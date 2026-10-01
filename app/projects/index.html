@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" class="bg-canvas text-ink antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a1211" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Three families, three jobs, and none of them is the Space Mono costume:
+        Space Grotesk  display + UI. A proportional cut of Space Mono, tuned for
+                       non-display sizes, so it keeps the technical letterforms
+                       without reading as a screenshot of a terminal.
+        Newsreader     prose. A long-form serif reads as a hiring document, which
+                       is what this page actually is.
+        Geist Mono     values only: counts, timestamps, versions, paths. Never a
+                       sentence — that rule is what keeps the engineering register
+                       from becoming a costume.
+
+      display=swap on all three. The canvas paints immediately and the type
+      resolves in place; blocking the first paint on three families would cost
+      LCP for text that has a perfectly good fallback.
+    -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist+Mono:wght@400;500&display=swap"
+    />
+    <title>Systems — Awon Aziz</title>
+    <meta
+      name="description"
+      content="Entry-level AI and MLOps engineer. Embedding and output-quality drift, an LLM-as-judge regression suite, champion/challenger promotion, and scheduled automation that has run unattended for weeks."
+    />
+    <!-- A coherent default for non-JS crawlers; src/hooks/use-seo.ts rewrites
+         it from the same validated config the page renders. -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content="Awon Aziz — AI / MLOps engineer" />
+    <meta
+      property="og:description"
+      content="Drift detection, model promotion, retrieval evaluation, incident triage. Public, runnable, tested — and where something did not work, it says so."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Awon Aziz — AI / MLOps engineer" />
+    <meta
+      name="twitter:description"
+      content="Drift detection, model promotion, retrieval evaluation, incident triage."
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <!--
+      There is no preloader on this site, deliberately.
+
+      A gate that delays the first readable sentence was on the previous version
+      and it was the single worst decision in it. Full-screen entrance
+      animations are named as a disqualifier in portfolio screening for an
+      obvious reason: a one-second loader is a one-second delay, and the hero
+      headline is the only positioning asset an engineer without an employment
+      history has. The WebGL scene lazy-loads behind a gradient instead, so the
+      atmosphere arrives after the content rather than in front of it.
+    -->
+    <noscript>
+      <div style="padding: 4rem; max-width: 44rem; font-family: Georgia, serif; line-height: 1.7">
+        <h1 style="font-family: system-ui, sans-serif">Awon Aziz — AI / MLOps engineer</h1>
+        <p>
+          This site renders a WebGL scene and needs JavaScript. The work does not — all five
+          systems are public, and the limitations of each are written in its README.
+        </p>
+        <ul>
+          <li><a href="https://github.com/AwonAziz/llm-drift-monitor">llm-drift-monitor</a> — embedding drift, output-quality drift and an LLM-as-judge regression suite; 184 tests, all offline</li>
+          <li><a href="https://github.com/AwonAziz/cleanjobfunnel">cleanjobfunnel</a> — eighteen job boards, every twenty minutes, running unattended since August</li>
+          <li><a href="https://github.com/AwonAziz/ml-lifecycle-platform">ml-lifecycle-platform</a> — drift detection and a promotion gate that can refuse</li>
+          <li><a href="https://github.com/AwonAziz/Hybrid-retrieval">Hybrid-retrieval</a> — retrieval that switches off half of itself below a corpus threshold</li>
+          <li><a href="https://github.com/AwonAziz/AI-Pair-Engineer">AI-Pair-Engineer</a> — four review agents that never execute your code</li>
+        </ul>
+        <p>Contact: <a href="mailto:awonaziz786@gmail.com">awonaziz786@gmail.com</a></p>
+      </div>
+    </noscript>
+    <script type="module" src="../src/main.tsx"></script>
+  </body>
+</html>

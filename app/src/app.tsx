@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { ProjectDetail, ProjectsIndex } from "@/components/pages/projects";
 import { Site } from "@/components/site";
+import { AppearanceMenu } from "@/components/ui/appearance-menu";
 import { useSeo } from "@/hooks/use-seo";
 
 const LazyScene = lazy(() =>
@@ -8,38 +10,53 @@ const LazyScene = lazy(() =>
 
 /**
  * ---------------------------------------------------------------------------
- *  App shell
+ *  Routes
  * ---------------------------------------------------------------------------
- *  There is no preloader here, and that is the most consequential decision in
- *  this file.
+ *  Three real documents, resolved from the path rather than a router:
  *
- *  The previous version gated the first paint behind a measured counter. It was
- *  technically impressive and it was wrong: full-screen entrance animations are
- *  named as a disqualifier in portfolio screening for the obvious reason that a
- *  one-second loader is a one-second delay, and the hero headline is the only
- *  positioning asset an engineer without an employment history has. It was also
- *  a WCAG 2.2.2 exposure bought for nothing.
+ *    /            the overview
+ *    /projects/   the system index
+ *    /project/    one system, deep dive
  *
- *  Instead the WebGL layer lazy-loads behind a gradient that matches the canvas,
- *  so the atmosphere arrives *after* the content rather than in front of it.
+ *  A router would mean every route exists only after JavaScript executes, which
+ *  is the same problem the static JSON-LD injection was solving. A `basename`-aware
+ *  matcher is a few lines and the routes are known and fixed, so a router would
+ *  be dependency for its own sake.
  * ---------------------------------------------------------------------------
  */
+type Route = "home" | "projects" | "project";
+
+function routeFor(pathname: string): Route {
+  /**
+   * Matched on path *segments*, not on a prefix strip.
+   *
+   * The obvious implementation — remove `import.meta.env.BASE_URL` and compare
+   * the remainder — breaks here, because `base` is `"./"` for sub-path
+   * compatibility, so `BASE_URL` is `"./"`, slicing by its length turns
+   * `/projects/` into `projects/` and every `startsWith("/projects")` is false.
+   * Every route silently rendered the home page. Matching segments is immune to
+   * whatever the base is.
+   */
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.includes("projects")) return "projects";
+  if (segments.includes("project")) return "project";
+  return "home";
+}
+
 export function App() {
   useSeo();
+  const [route] = useState<Route>(() =>
+    routeFor(typeof window === "undefined" ? "/" : window.location.pathname),
+  );
   const [sceneReady, setSceneReady] = useState(false);
 
   /**
    * Wait for `load` before mounting the canvas at all.
    *
    * Lazy *loading* the chunk is only half the story: creating the WebGL context
-   * and compiling the shaders is still main-thread work, and compilation in
-   * particular routinely costs hundreds of milliseconds. Doing that during
-   * startup queues every click and scroll arriving in the meantime, and that
-   * queued delay is precisely what INP measures. This is the step most WebGL
-   * sites skip.
-   *
-   * `load` rather than a timeout, so a slow font or image still wins. The
-   * listener is removed once it fires so it does not outlive the page.
+   * and compiling the shaders is still main-thread work, and compilation
+   * routinely costs hundreds of milliseconds. Doing that during startup queues
+   * every click and scroll arriving in the meantime, which is what INP measures.
    */
   useEffect(() => {
     if (document.readyState === "complete") {
@@ -51,6 +68,11 @@ export function App() {
     return () => window.removeEventListener("load", onLoad);
   }, []);
 
+  // Lenis smooths the page scroll; on a document that is a page rather than a
+  // continuous scroll it only gets in the way of the browser's own behaviour,
+  // and its `anchors` handling would fight the breadcrumb links.
+  const smooth = route === "home";
+
   return (
     <>
       {sceneReady ? (
@@ -58,7 +80,59 @@ export function App() {
           <LazyScene />
         </Suspense>
       ) : null}
-      <Site />
+      {smooth ? <Site /> : <StandaloneShell route={route} />}
     </>
+  );
+}
+
+/**
+ * Shared chrome for the two project routes. Deliberately not the full `Site`:
+ * those pages have no 20,000px of content to smooth-scroll through, and
+ * mounting the whole overview to show one project would defeat the code
+ * splitting that made these separate documents worth having.
+ */
+function StandaloneShell({ route }: { route: Route }) {
+  return (
+    <div className="relative min-h-svh">
+      <div aria-hidden="true" className="scrim-block pointer-events-none fixed inset-0" />
+      <div className="shell relative">
+        <header className="flex items-center justify-between gap-4 border-b border-white/10 py-5">
+          <a
+            href="./index.html"
+            className="font-mono text-small tracking-tight text-ink/90 transition-colors hover:text-accent"
+          >
+            Awon Aziz<span className="text-accent">.</span>
+          </a>
+          <nav aria-label="Primary" className="flex items-center gap-4">
+            <a
+              href="./index.html#systems"
+              className="font-mono text-small text-ink-faint transition-colors hover:text-ink"
+            >
+              Overview
+            </a>
+            <a
+              href="./projects/"
+              className="font-mono text-small text-ink-faint transition-colors hover:text-ink"
+            >
+              Systems
+            </a>
+            {/* Appearance on every page, not just the overview. A theme control
+                that only exists on one route is a control that appears to be
+                missing when a reader lands on a shared link. */}
+            <AppearanceMenu />
+            <a
+              href="./index.html#contact"
+              className="rounded-pill bg-accent px-3.5 py-1.5 font-mono text-small font-medium on-accent transition-transform hover:scale-105"
+            >
+              Email
+            </a>
+          </nav>
+        </header>
+
+        <main id="main" className="pb-24">
+          {route === "projects" ? <ProjectsIndex /> : <ProjectDetail />}
+        </main>
+      </div>
+    </div>
   );
 }

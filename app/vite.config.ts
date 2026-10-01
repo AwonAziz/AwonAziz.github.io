@@ -1,8 +1,10 @@
+import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import { buildPersonSchema, buildStaticSummary } from "./src/lib/seo-static";
+import { THEME_BOOT_SCRIPT } from "./src/lib/theme";
 
 /**
  * ---------------------------------------------------------------------------
@@ -27,6 +29,16 @@ function staticInjection(): Plugin {
     transformIndexHtml() {
       const jsonLd = JSON.stringify(buildPersonSchema());
       return [
+        {
+          // `head-prepend` so it runs before the stylesheet is even parsed, not
+          // merely before the body renders. A theme applied a frame late is the
+          // thing that reads as a cheap theme switcher, and the fix is position
+          // rather than timing.
+          tag: "script",
+          attrs: {},
+          children: THEME_BOOT_SCRIPT,
+          injectTo: "head-prepend",
+        },
         {
           tag: "script",
           attrs: { type: "application/ld+json" },
@@ -73,6 +85,26 @@ export default defineConfig(({ mode }) => {
       cssMinify: "lightningcss",
       reportCompressedSize: true,
       rollupOptions: {
+        /**
+         * Multi-page.
+         *
+         * Three real HTML entries rather than a client-side router. The reason is
+         * the same as the JSON-LD work: a router means every route exists only
+         * after JavaScript runs, and the crawlers and previewers that matter most
+         * do not run it. A separate document per route is also a separate
+         * payload, so opening a project does not re-download the homepage's
+         * section components.
+         *
+         * `projects/` and `project/` are directories with an index.html, which is
+         * what makes the URLs read `/projects/` and `/project/?id=slug` rather
+         * than `projects.html`. Combined with `base: "./"` that works unchanged
+         * on a GitHub Pages sub-path and on Cloudflare.
+         */
+        input: {
+          main: resolve(import.meta.dirname, "index.html"),
+          projects: resolve(import.meta.dirname, "projects/index.html"),
+          project: resolve(import.meta.dirname, "project/index.html"),
+        },
         output: {
           // three + r3f is ~270kB gzipped and 100% client-side. Splitting it
           // keeps it out of the initial HTML payload and lets it cache

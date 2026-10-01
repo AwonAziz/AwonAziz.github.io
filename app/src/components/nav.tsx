@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { site } from "@/config/site.data";
 import { cn } from "@/lib/cn";
 import { gsap, ScrollTrigger } from "@/providers/smooth-scroll";
+import { AppearanceMenu } from "./ui/appearance-menu";
 
 /**
  * ---------------------------------------------------------------------------
@@ -111,13 +112,20 @@ export function Nav() {
                 <a
                   href="#contact"
                   data-cursor-label="Email"
-                  className="block rounded-pill bg-accent px-3.5 py-1.5 font-mono text-small font-medium text-canvas transition-transform hover:scale-105 lg:px-4"
+                  className="block rounded-pill bg-accent px-3.5 py-1.5 font-mono text-small font-medium on-accent transition-transform hover:scale-105 lg:px-4"
                 >
                   Email
                 </a>
               </li>
             </ul>
           </nav>
+
+          {/* Appearance sits outside the nav list: it is not a section link, and
+              giving it its own separator keeps its focus ring from competing
+              with the current-section marker. */}
+          <div className="ml-2 border-l border-white/12 pl-2">
+            <AppearanceMenu />
+          </div>
         </div>
       </div>
     </header>

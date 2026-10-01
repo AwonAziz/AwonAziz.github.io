@@ -8,6 +8,7 @@ import {
   type Texture,
   Vector2,
 } from "three";
+import { useSceneColors } from "@/hooks/use-theme";
 import { getQuality } from "@/lib/quality";
 import { scrollState } from "@/lib/scroll-store";
 import { rainFragmentShader, rainVertexShader } from "../shaders";
@@ -86,6 +87,7 @@ export function MatrixRain({
   const quality = getQuality();
   const size = useThree((state) => state.size);
   const atlas = useMemo(() => getGlyphAtlas(), []);
+  const colors = useSceneColors();
 
   const uniforms = useMemo<RainUniforms>(
     () => ({
@@ -112,12 +114,13 @@ export function MatrixRain({
       uGuardEnd: { value: 0.78 },
       // Head near-white, trail a saturated phosphor. The head being the only
       // near-white cell is what makes the effect read as light through a medium
-      // rather than as green noise.
-      uColorHead: { value: new Color("#f2fff8") },
-      uColorTail: { value: new Color("#1aff8c") },
+      // rather than as green noise. Both come from the live theme, so a palette
+      // change recolours the rain as well as the interface.
+      uColorHead: { value: new Color(colors.head.getHex()) },
+      uColorTail: { value: new Color(colors.trail.getHex()) },
       uAtlas: { value: atlas?.texture },
     }),
-    [atlas, quality.rainOpacity],
+    [atlas, quality.rainOpacity, colors],
   );
 
   const material = useMemo(

@@ -3,6 +3,7 @@ import { addEffect, Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import { type Color, NoToneMapping, SRGBColorSpace } from "three";
 import { useQuality } from "@/hooks/use-quality";
+import { useSceneColors } from "@/hooks/use-theme";
 import { cn } from "@/lib/cn";
 import { motionBlocked } from "@/lib/motion-prefs";
 import { downgrade } from "@/lib/quality";
@@ -32,28 +33,34 @@ function GsapClockBridge() {
   return null;
 }
 
-/** Background tint, deepening slightly as the reader descends. */
+/**
+ * Background tint.
+ *
+ * Colour comes from the live CSS custom properties rather than a constant, so
+ * a theme or palette change reaches the GPU as well as the DOM. Hardcoding it
+ * was how the two halves would have drifted: a light theme with a black
+ * WebGL background behind it is exactly the bug this avoids.
+ *
+ * Values are set in **linear-sRGB** — three.js has used that as its working
+ * colour space since r155, so `setRGB(0.047)` renders as sRGB ~0.24 (#3D), not
+ * #0C. Writing what looks like a hex value there produced a measured #202124
+ * background, a medium grey, which is why the rain read as flat texture.
+ */
 function Atmosphere() {
+  const { background } = useSceneColors();
   const colorRef = useRef<Color>(null);
 
   useFrame(() => {
     const color = colorRef.current;
     if (!color) return;
     const t = scrollState.progress;
-    // NOTE: these are LINEAR-sRGB values, not the hex-looking numbers they
-    // appear to be. three.js uses linear-sRGB as its working colour space since
-    // r155, so `setRGB(0.047)` renders as sRGB ~0.24 (#3D) — not #0C. Writing
-    // what looked like a near-black hex here produced a measured background of
-    // #202124, a medium grey, which is why the rain never looked like it was
-    // glowing against anything.
-    //
-    // These are chosen to land around #050807 in sRGB, with a faint green cast.
-    // It deepens very slightly on descent: a hue shift over 20,000px reads as an
-    // accident, a value shift does not.
-    color.setRGB(0.0016 - t * 0.0006, 0.0028 - t * 0.0011, 0.0024 - t * 0.0011);
+    color.copy(background);
+    // Deepens slightly on descent. A value shift, not a hue shift — a hue
+    // change across 20,000px reads as an accident.
+    color.multiplyScalar(1 - t * 0.22);
   });
 
-  return <color ref={colorRef} attach="background" args={["#050807"]} />;
+  return <color ref={colorRef} attach="background" args={[background.getHex()]} />;
 }
 
 /**

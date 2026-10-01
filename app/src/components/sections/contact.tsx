@@ -51,7 +51,7 @@ export function Contact() {
                 "AI / MLOps role — Python, Kubernetes, drift detection",
               )}`}
               data-cursor-label="Write"
-              className="group inline-flex items-center gap-3 rounded-pill bg-accent px-7 py-4 font-mono text-small font-medium text-canvas"
+              className="group inline-flex items-center gap-3 rounded-pill bg-accent px-7 py-4 font-mono text-small font-medium on-accent"
             >
               {site.contact.cta}
               <svg

@@ -199,7 +199,7 @@ export function Hero() {
               <a
                 href="#systems"
                 data-cursor-label="Read"
-                className="group inline-flex items-center gap-3 rounded-pill bg-accent px-6 py-3.5 font-mono text-small font-medium text-canvas"
+                className="group inline-flex items-center gap-3 rounded-pill bg-accent px-6 py-3.5 font-mono text-small font-medium on-accent"
               >
                 {site.headline.ctaPrimary}
                 <svg

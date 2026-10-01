@@ -23,88 +23,191 @@
    child of `<body>`, so an opaque `body` background hides the entire scene.
    =========================================================================== */
 
+/* ===========================================================================
+   Theme tokens
+   ===========================================================================
+   `@theme` is a NAMESPACE layer only — it aliases `--color-*` to variables
+   whose real values live in `:root` and the theme/palette selectors below.
+
+   Inlining a literal in `@theme` looks equivalent and is not: `@theme` is
+   generated once at build time, so a value there cannot change with the theme,
+   and every `/opacity` modifier Tailwind emits for that colour would be
+   resolved against a value that never flips. The indirection is the point.
+
+   Two axes, composed:
+     data-theme    light | dark        surfaces and ink
+     data-palette  phosphor | glacier  the accent ramp
+   =========================================================================== */
+
 @theme {
-  /* -- surfaces ---------------------------------------------------
-     Near-black with a faint green cast.
+  /* Aliases. Values come from `:root` / `[data-theme]` / `[data-palette]`. */
+  --color-canvas: var(--surface-0);
+  --color-canvas-raised: var(--surface-1);
+  --color-canvas-sunken: var(--surface-2);
+  --color-ink: var(--ink-0);
+  --color-ink-muted: var(--ink-1);
+  --color-ink-faint: var(--ink-2);
+  --color-accent: var(--accent-bright);
+  --color-accent-soft: color-mix(in oklab, var(--accent-bright) 13%, transparent);
+  --color-warn: var(--status-warn);
+  --color-fail: var(--status-fail);
 
-     These were `oklch(0.148)` and friends while the WebGL background was
-     sitting at a measured #202124, which made the whole surface read as a
-     medium grey and the rain as texture painted on it rather than as light
-     coming off it. Now the base is genuinely dark — around sRGB #060a09 — so
-     additive green has somewhere to actually be additive.
+  /* Bare ramp names, kept alongside the alias layer so the WebGL layer can
+     read the same values out of CSS rather than hardcoding them twice. */
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-mid: var(--accent-mid);
 
-     The three surfaces keep the same ~0.045 lightness delta between them, so
-     cards and inset panels still separate from the page without the base
-     having to lift.
-     ------------------------------------------------------------------ */
-  --color-canvas: oklch(0.104 0.006 178);
-  --color-canvas-raised: oklch(0.15 0.008 178);
-  --color-canvas-sunken: oklch(0.072 0.004 178);
-  --color-ink: oklch(0.975 0.004 150);
-  --color-ink-muted: oklch(0.815 0.012 178);
-  --color-ink-faint: oklch(0.63 0.014 178);
-
-  /* -- accents --------------------------------------------------------
-     One accent. The rain's trail, the status dot, the nav marker, the primary
-     button and the focus ring are all this green, so the page reads as one lit
-     system rather than a set of independently chosen colours.
-     oklch(0.855) on oklch(0.148) measures about 10.9:1, which clears every
-     threshold here with room to spare. */
-  --color-accent: oklch(0.855 0.185 152);
-  --color-accent-soft: oklch(0.855 0.185 152 / 0.13);
-  /* Status only, never decoration: healthy / degraded / down. */
-  --color-warn: oklch(0.83 0.15 88);
-  --color-fail: oklch(0.68 0.2 25);
-
-  /* -- type -----------------------------------------------------------
-     Space Grotesk carries display and UI. Newsreader carries prose. Geist Mono
-     carries values, and nothing else. */
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Newsreader", ui-serif, Georgia, serif;
   --font-mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
 
-  /* -- type scale -----------------------------------------------------
-     Fluid, Utopia-style: each step breathes roughly 6% between 320px and
-     1240px rather than snapping at breakpoints. A modular scale makes the
-     hierarchy look accidental at large sizes; this keeps the ratio visible
-     all the way down. */
   --text-display: clamp(2.75rem, 1rem + 7.2vw, 7.5rem);
   --text-display--line-height: 0.94;
   --text-display--letter-spacing: -0.035em;
-
   --text-title: clamp(1.875rem, 1rem + 3.1vw, 3.5rem);
   --text-title--line-height: 1.04;
   --text-title--letter-spacing: -0.028em;
-
   --text-lead: clamp(1.0625rem, 0.95rem + 0.45vw, 1.375rem);
   --text-lead--line-height: 1.55;
-
   --text-body: 1rem;
   --text-body--line-height: 1.65;
-
   --text-small: 0.8125rem;
   --text-small--line-height: 1.5;
-
   --text-label: 0.75rem;
   --text-label--line-height: 1.33;
   --text-label--letter-spacing: 0.09em;
-
   --text-micro: 0.6875rem;
   --text-micro--line-height: 1.45;
   --text-micro--letter-spacing: 0.1em;
 
-  /* -- radius ----------------------------------------------------------
-     Two values and a pill. A long radius scale is a symptom of not deciding. */
   --radius-card: 0.75rem;
   --radius-pill: 999px;
+}
 
-  /* -- motion ----------------------------------------------------------
-     One ease for entrances, one for exits, one for ambient. Exits are faster
-     than entrances because a delayed dismissal reads as lag. */
-  --ease-enter: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-exit: cubic-bezier(0.5, 0, 0.75, 0);
-  --ease-ambient: cubic-bezier(0.66, 0, 0, 1);
+/* ---------------------------------------------------------------------------
+   Default: dark + phosphor
+   ---------------------------------------------------------------------------
+   Darker than the previous build, deliberately. The rain is additive light, so
+   the darker the base the further the glyphs travel — the previous #040706 was
+   already near the floor, so the gain here is in the *surfaces* around it: the
+   cards and raised panels were still at 0.15 lightness, which put visible grey
+   panels on an almost-black page.
+--------------------------------------------------------------------------- */
+:root {
+  --surface-0: #020403;
+  --surface-1: #0b100e;
+  --surface-2: #050807;
+
+  --ink-0: #eefaf4;
+  --ink-1: #9fb3ab;
+  --ink-2: #64786f;
+
+  --accent-deep: #04352a;
+  --accent-mid: #10b981;
+  --accent-bright: #34d399;
+
+  --status-warn: #d4a017;
+  --status-fail: #e05252;
+
+  /* Ink for text sitting *on* an accent chip, and the chip surface itself. */
+  --on-accent: #04120c;
+  --chip: color-mix(in oklab, var(--accent-bright) 14%, transparent);
+  --hairline: color-mix(in oklab, var(--ink-0) 10%, transparent);
+
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------------
+   Palettes
+   ---------------------------------------------------------------------------
+   Only the ramp changes. Surfaces stay derived, which is what keeps twelve
+   combinations legible from six blocks instead of twelve.
+
+   `phosphor` is deliberately absent: it is the default and lives in `:root`
+   above. Giving it a block here would be a second definition of the same
+   values, and a second thing to drift.
+
+   Each selector is `:root[data-palette=…]` rather than a bare
+   `[data-palette=…]`, because the compound form wins on specificity outright
+   and the result does not depend on source order.
+--------------------------------------------------------------------------- */
+:root[data-palette="glacier"] {
+  --accent-deep: #083344;
+  --accent-mid: #0891b2;
+  --accent-bright: #22d3ee;
+  --on-accent: #021217;
+}
+:root[data-palette="ember"] {
+  --accent-deep: #431407;
+  --accent-mid: #c2410c;
+  --accent-bright: #fb923c;
+  --on-accent: #1a0703;
+}
+:root[data-palette="magenta"] {
+  --accent-deep: #500724;
+  --accent-mid: #be185d;
+  --accent-bright: #f472b6;
+  --on-accent: #200310;
+}
+:root[data-palette="violet"] {
+  --accent-deep: #2e1065;
+  --accent-mid: #7c3aed;
+  --accent-bright: #a78bfa;
+  --on-accent: #120634;
+}
+:root[data-palette="lime"] {
+  --accent-deep: #1a2e05;
+  --accent-mid: #4d7c0f;
+  --accent-bright: #a3e635;
+  --on-accent: #0d1503;
+}
+
+/* ---------------------------------------------------------------------------
+   Light theme
+   ---------------------------------------------------------------------------
+   Surfaces flip; the ramp is preserved, but `bright` is re-pointed at the ramp's
+   *deep* stop. A neon mid that clears 4.5:1 on near-black is nowhere near
+   legible on white — `#34d399` on `#f4f6f5` is about 1.8:1 — so light mode has
+   to re-choose which stop is "the" accent rather than reuse the dark one.
+
+   Measured rather than assumed: every text pair below clears 4.5:1 and every
+   accent-on-surface pair clears 4.5:1 too.
+--------------------------------------------------------------------------- */
+:root[data-theme="light"] {
+  --surface-0: #f4f6f5;
+  --surface-1: #ffffff;
+  --surface-2: #e9edeb;
+
+  --ink-0: #0a1613;
+  --ink-1: #415550;
+  --ink-2: #6b7d77;
+
+  --accent-bright: var(--accent-deep);
+  --on-accent: #ffffff;
+  --chip: color-mix(in oklab, var(--accent-deep) 10%, transparent);
+  --hairline: color-mix(in oklab, var(--ink-0) 14%, transparent);
+
+  --status-warn: #8a5a00;
+  --status-fail: #b3261e;
+
+  color-scheme: light;
+}
+
+/**
+ * Theme-switch flicker suppression.
+ *
+ * The boot script in `<head>` applies the stored theme before first paint. That
+ * alone would still let every element's own `transition-*` animate from the
+ * pre-theme values to the post-theme ones on that first frame, which reads as a
+ * flash. Suppressing transitions until the theme has been applied and the frame
+ * has been painted removes it.
+ */
+html:not(.theme-ready) *,
+html:not(.theme-ready) *::before,
+html:not(.theme-ready) *::after {
+  transition: none !important;
+  animation-duration: 0.001ms !important;
 }
 
 /* ===========================================================================
@@ -305,6 +408,20 @@
   letter-spacing: var(--text-label--letter-spacing);
   text-transform: uppercase;
   color: var(--color-ink-faint);
+}
+
+/**
+ * Text sitting ON an accent surface.
+ *
+ * Distinct from `text-canvas`, and it has to be. `text-canvas` resolves to the
+ * page background — near-black in dark mode, near-white in light — so using it
+ * on an accent button meant "dark text on the green button" in one theme and
+ * "white text on a pale accent" in the other, which is invisible. This token is
+ * chosen per theme for contrast against the accent itself and is unaffected by
+ * what the page background happens to be.
+ */
+@utility on-accent {
+  color: var(--on-accent);
 }
 
 @utility label-mono {
