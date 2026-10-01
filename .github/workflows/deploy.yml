@@ -1,21 +1,26 @@
 # ---------------------------------------------------------------------------
 #  GitHub Pages deploy
 # ---------------------------------------------------------------------------
-#  Pushes to the default branch build and publish. Also runs on any other
-#  branch, but only *builds* it — so a pull request from a fork fails the
-#  typecheck/lint step without ever touching Pages.
+#  Two things happen here, and the order matters:
 #
-#  One-time setup (the workflow does this for you, but it has to happen once):
-#    Settings → Pages → Build and deployment → Source → GitHub Actions
+#  1. `app/` is built and quality-gated — lint, then typecheck, then the actual
+#     build. A failing type error never reaches the deploy step, so a broken
+#     push cannot ship. This is the same gate that caught a production-only
+#     ZodError during the first deploy.
 #
-#  Sub-path vs. custom domain
-#  -------------------------
-#  A `user.github.io` *user* site serves at the root, so `VITE_BASE_PATH` is
-#  empty and asset URLs stay relative. A `user.github.io/repo` *project* site
-#  serves from a sub-path — also fine, because `base` defaults to "./" and Vite
-#  emits relative asset URLs either way. You do not need to change anything.
+#  2. The built site is copied to the repository root and committed back.
+#
+#  Step 2 is not the usual pattern, and it exists for a specific reason: Pages
+#  here is configured to deploy `main/root` as a branch build with Jekyll, which
+#  cannot be changed without repo admin access. A Jekyll branch build serves
+#  whatever is at the root, so the built site has to *be* at the root. Flipping
+#  the setting to "GitHub Actions" (Settings -> Pages -> Source) lets step 2 be
+#  deleted and the `actions/deploy-pages` artifact path used directly.
+#
+#  The skip-ci marker on the commit is not optional. Without it the commit this
+#  workflow makes would re-trigger the workflow that made it.
 # ---------------------------------------------------------------------------
-name: Deploy to GitHub Pages
+name: Build and publish
 
 on:
   push:
@@ -24,13 +29,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Only the default branch may publish. Every other trigger is a build check.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Never cancel a deploy mid-publish; let in-flight runs finish.
+# Never two publishers racing for the root.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -38,6 +40,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
     steps:
       - uses: actions/checkout@v4
 
@@ -45,12 +50,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: app/package-lock.json
 
-      - name: Install
-        run: npm ci
+      - run: npm ci
 
-      # Lint and typecheck run here, before the build, so a broken push never
-      # reaches Pages. This doubles as the quality gate on pull requests.
       - name: Lint
         run: npm run lint
 
@@ -60,28 +63,40 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Canonical origin for the canonical link and the OG/JSON-LD payload.
-          #
-          # The `||` fallback is load-bearing. An unset Actions repository
-          # variable is passed through as an empty string rather than being
+          # An unset Actions variable arrives as an empty string, not as
           # omitted, and an empty string is not a valid URL — the content schema
-          # rejects it and the deployed page dies on a ZodError.
+          # rejects it and the deployed page dies before it mounts.
           VITE_SITE_URL: ${{ vars.VITE_SITE_URL || 'https://awonaziz.github.io' }}
 
-      - uses: actions/configure-pages@v5
-        id: pages
+      # Publish only from the default branch, and only on a real push. Pull
+      # requests still get the full quality gate above.
+      - name: Publish to repository root
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          root="$(git rev-parse --show-toplevel)"
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
+          # Replace the deployed artefacts wholesale so a renamed or deleted
+          # file cannot survive from a previous deploy.
+          rm -rf "$root/assets"
+          cp -r app/dist/assets "$root/assets"
+          cp app/dist/index.html "$root/index.html"
+          for file in .nojekyll favicon.svg robots.txt sitemap.xml _headers _redirects; do
+            [ -e "app/dist/$file" ] && cp "app/dist/$file" "$root/$file"
+          done
 
-  deploy:
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          cd "$root"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- assets index.html favicon.svg robots.txt sitemap.xml _headers _redirects .nojekyll
+
+          if git diff --cached --quiet; then
+            echo "No change to publish."
+            exit 0
+          fi
+
+          git commit -m "chore: publish build [skip ci]"
+          # Only ever fast-forward: this job runs on a fresh checkout whose
+          # HEAD is the commit that triggered it, so a non-fast-forward here
+          # means someone pushed concurrently and the next run will reconcile.
+          git push origin HEAD:main

@@ -1,0 +1,8 @@
+# ---------------------------------------------------------------------------
+#  Cloudflare Pages SPA fallback
+# ---------------------------------------------------------------------------
+#  This site is a single page with anchor navigation and no client-side router,
+#  so it never actually hits a 404. This rule exists so that if a path is ever
+#  added later, a direct link to it still serves the app instead of a 404.
+# ---------------------------------------------------------------------------
+/*  /index.html  200

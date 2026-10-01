@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://awonaziz.github.io/sitemap.xml

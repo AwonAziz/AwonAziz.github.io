@@ -1,0 +1,35 @@
+# ---------------------------------------------------------------------------
+#  Cloudflare Pages / Netlify header rules
+# ---------------------------------------------------------------------------
+#  Cloudflare Pages and Netlify both read this file verbatim out of the publish
+#  directory. GitHub Pages ignores it, which is why the equivalent headers are
+#  also set in public/_headers-gh for `netlify.toml`-free setups — on GitHub
+#  Pages, add them in a custom 404.html or via a Cloudflare proxy in front.
+# ---------------------------------------------------------------------------
+
+/*
+  # No third-party scripts, fonts, or analytics on this site. The CSP is
+  # deliberately strict: it names the four origins the page actually needs and
+  # nothing else. If you add an analytics script, amend `connect-src` and
+  # `script-src` here or it will be blocked in production and nowhere else.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://awonaziz.github.io; worker-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'
+
+  # The page fetches its live telemetry from two origins. Everything else is
+  # same-origin, so the default is 'self' and the exceptions are named.
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+# Vite fingerprints every asset filename, so they are safe to cache forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The HTML must never be cached, or a deploy is invisible until the TTL lapses.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/favicon.svg
+  Cache-Control: public, max-age=604800
