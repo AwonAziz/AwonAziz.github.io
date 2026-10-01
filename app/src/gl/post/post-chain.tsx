@@ -54,10 +54,19 @@ export function PostChain() {
   return (
     <EffectComposer multisampling={quality.tier === "high" ? 4 : 0}>
       <Bloom
-        intensity={quality.bloom}
-        luminanceThreshold={0.16}
-        luminanceSmoothing={0.72}
-        kernelSize={quality.tier === "high" ? KernelSize.LARGE : KernelSize.MEDIUM}
+        intensity={quality.bloom * 1.15}
+        /* Low threshold on purpose. The rain is deliberately dim (its own
+           opacity is capped well under 1) and the base is now near-black, so a
+           high threshold made almost nothing reach the bloom pass and the green
+           read as flat paint rather than as light.
+
+           The kernel stays MEDIUM even at high tier. LARGE smeared the glow far
+           enough sideways that a bright head leaked out of the open right-hand
+           third and landed in the text column — measured, not assumed: it was
+           the worst-frame contrast, not the typical frame, that failed. */
+        luminanceThreshold={0.08}
+        luminanceSmoothing={0.55}
+        kernelSize={KernelSize.MEDIUM}
         mipmapBlur
       />
       <ChromaticAberration offset={offset} radialModulation modulationOffset={0.42} />

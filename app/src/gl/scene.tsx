@@ -40,13 +40,20 @@ function Atmosphere() {
     const color = colorRef.current;
     if (!color) return;
     const t = scrollState.progress;
-    // Matches the page canvas so the scene reads as one surface rather than a
-    // separate dark theme. It drifts deeper rather than changing hue: a hue
-    // shift over 20,000px is visible as an accident, a value shift is not.
-    color.setRGB(0.026 - t * 0.01, 0.047 - t * 0.014, 0.044 - t * 0.015);
+    // NOTE: these are LINEAR-sRGB values, not the hex-looking numbers they
+    // appear to be. three.js uses linear-sRGB as its working colour space since
+    // r155, so `setRGB(0.047)` renders as sRGB ~0.24 (#3D) — not #0C. Writing
+    // what looked like a near-black hex here produced a measured background of
+    // #202124, a medium grey, which is why the rain never looked like it was
+    // glowing against anything.
+    //
+    // These are chosen to land around #050807 in sRGB, with a faint green cast.
+    // It deepens very slightly on descent: a hue shift over 20,000px reads as an
+    // accident, a value shift does not.
+    color.setRGB(0.0016 - t * 0.0006, 0.0028 - t * 0.0011, 0.0024 - t * 0.0011);
   });
 
-  return <color ref={colorRef} attach="background" args={["#070c0b"]} />;
+  return <color ref={colorRef} attach="background" args={["#050807"]} />;
 }
 
 /**

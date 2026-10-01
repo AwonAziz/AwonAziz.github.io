@@ -60,6 +60,8 @@ interface RainUniforms {
   uFrozen: IUniform<number>;
   uScroll: IUniform<number>;
   uVelocity: IUniform<number>;
+  uGuardStart: IUniform<number>;
+  uGuardEnd: IUniform<number>;
   uColorHead: IUniform<Color>;
   uColorTail: IUniform<Color>;
   uAtlas: IUniform<Texture | undefined>;
@@ -104,6 +106,10 @@ export function MatrixRain({
       uFrozen: { value: 0 },
       uScroll: { value: 0 },
       uVelocity: { value: 0 },
+      // Set every frame from viewport width and scroll; these initial values
+      // only affect the single frame before the loop starts.
+      uGuardStart: { value: 0.55 },
+      uGuardEnd: { value: 0.78 },
       // Head near-white, trail a saturated phosphor. The head being the only
       // near-white cell is what makes the effect read as light through a medium
       // rather than as green noise.
@@ -146,6 +152,50 @@ export function MatrixRain({
     uniforms.uGrid.value.set(columns, rows);
     uniforms.uOpacity.value = quality.rainOpacity;
   }, [size.width, size.height, quality.rainCell, quality.rainOpacity, uniforms]);
+
+  /**
+   * Reading-column guard.
+   *
+   * The hero's display headline is the only element on the page that fills the
+   * left half of the viewport, and the measured bounding box of its paragraph
+   * reaches x = 0.61 at 1600px wide. So the guard is positioned to cover that,
+   * then relaxed as the reader scrolls into the sections, where copy is
+   * prose-sized and the field can run at full strength across more of the frame.
+   *
+   * Below lg the paragraph wraps to the full width, so the guard has to span
+   * almost everything — a phone gets the protection a desktop does not need,
+   * and a phone has no right-hand margin to carry the effect instead.
+   */
+  useFrame(() => {
+    const width = size.width;
+    const wide = width >= 1280;
+    const mid = width >= 1024;
+    const tablet = width >= 768;
+
+    // Base position by breakpoint.
+    let start = tablet ? (mid ? 0.72 : 0.94) : 1.0;
+    let end = tablet ? (mid ? 0.9 : 1.0) : 1.0;
+
+    // Relax with scroll: by ~28% down the page the hero is long gone.
+    const relax = Math.min(1, scrollState.progress / 0.28);
+    if (wide) {
+      start = 0.6 + (0.08 - 0.6) * relax;
+      end = 0.84 + (0.34 - 0.84) * relax;
+    } else if (mid) {
+      start = 0.72 + (0.12 - 0.72) * relax;
+      end = 0.9 + (0.4 - 0.9) * relax;
+    } else if (tablet) {
+      start = 0.94 + (0.18 - 0.94) * relax;
+      end = 1.0 + (0.45 - 1.0) * relax;
+    } else {
+      // Phone: the field is dimmed throughout, but relaxes on scroll too.
+      start = 1.0 + (0.2 - 1.0) * relax;
+      end = 1.0 + (0.5 - 1.0) * relax;
+    }
+
+    uniforms.uGuardStart.value = start;
+    uniforms.uGuardEnd.value = Math.max(end, start + 0.08);
+  });
 
   useEffect(() => {
     uniforms.uGlyphCount.value = atlas?.count ?? 0;

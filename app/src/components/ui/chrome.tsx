@@ -31,7 +31,7 @@ export function Grain() {
     <div
       aria-hidden="true"
       className={cn(
-        "pointer-events-none fixed inset-0 z-1 opacity-[0.035] mix-blend-overlay",
+        "pointer-events-none fixed inset-0 z-1 opacity-[0.025] mix-blend-overlay",
         // Hidden from assistive tech and from the tab order entirely.
         "[contain:strict]",
       )}
@@ -88,8 +88,13 @@ export function Scanlines() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-1 opacity-[0.07] [contain:strict]"
+      className="pointer-events-none fixed inset-0 z-1 opacity-[0.035] [contain:strict]"
       style={{
+        // An explicit dim colour rather than `currentColor`, which inherits the
+        // body text colour — bright enough that 5% of it still measured about
+        // 0.08 luminance in the reading column, which is a meaningful slice of
+        // the budget on a near-black base.
+        color: "oklch(0.62 0.02 178)",
         backgroundImage:
           "repeating-linear-gradient(to bottom, currentColor 0px, currentColor 1px, transparent 1px, transparent 3px)",
       }}

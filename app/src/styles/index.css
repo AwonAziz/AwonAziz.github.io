@@ -24,17 +24,25 @@
    =========================================================================== */
 
 @theme {
-  /* -- surfaces -------------------------------------------------------
-     Near-black with a cyan-green cast. Deliberately low lightness: the rain is
-     additive light, and any lift in the base would crush the contrast between
-     the glyphs and the page. Neutrals are anchored slightly toward the accent
-     hue so the greys read as part of the same lit system. */
-  --color-canvas: oklch(0.148 0.008 178);
-  --color-canvas-raised: oklch(0.196 0.01 178);
-  --color-canvas-sunken: oklch(0.112 0.006 178);
+  /* -- surfaces ---------------------------------------------------
+     Near-black with a faint green cast.
+
+     These were `oklch(0.148)` and friends while the WebGL background was
+     sitting at a measured #202124, which made the whole surface read as a
+     medium grey and the rain as texture painted on it rather than as light
+     coming off it. Now the base is genuinely dark — around sRGB #060a09 — so
+     additive green has somewhere to actually be additive.
+
+     The three surfaces keep the same ~0.045 lightness delta between them, so
+     cards and inset panels still separate from the page without the base
+     having to lift.
+     ------------------------------------------------------------------ */
+  --color-canvas: oklch(0.104 0.006 178);
+  --color-canvas-raised: oklch(0.15 0.008 178);
+  --color-canvas-sunken: oklch(0.072 0.004 178);
   --color-ink: oklch(0.975 0.004 150);
-  --color-ink-muted: oklch(0.8 0.012 178);
-  --color-ink-faint: oklch(0.638 0.014 178);
+  --color-ink-muted: oklch(0.815 0.012 178);
+  --color-ink-faint: oklch(0.63 0.014 178);
 
   /* -- accents --------------------------------------------------------
      One accent. The rain's trail, the status dot, the nav marker, the primary
@@ -364,36 +372,38 @@
    =========================================================================== */
 
 @utility scrim-left {
-  /* Recalibrated when the rain went from 0.17 to 0.46 opacity. Tripling the
-     effect without re-tuning this is what put glyphs across the body copy —
-     the scrim was sized for a faint field. The stops are now held near-solid
-     across the whole text column (which runs to roughly 62% of the shell) and
-     released quickly after, so the right third is unobstructed and dramatic
-     while the prose stays clean. */
+  /* Calibrated against measurement, not taste. Sampling the composited pixels
+     behind the hero paragraph across eight animation frames gave a *typical*
+     contrast of 7.69:1 but a *worst-case* of 1.29:1 — a bright rain head
+     passing directly behind the prose collapsed it. That is precisely the 1.4.3
+     failure: the ratio depends on which frame the reader happens to read on.
+
+     So the text column is held near-solid out to ~46% and only released after
+     it. The right third stays unobstructed and keeps the glow; the prose gets
+     an opaque bed. Re-measure rather than re-guess if this is touched again. */
   background-image: linear-gradient(
     100deg,
     var(--color-canvas) 0%,
-    color-mix(in oklch, var(--color-canvas) 97%, transparent) 22%,
-    color-mix(in oklch, var(--color-canvas) 90%, transparent) 42%,
-    color-mix(in oklch, var(--color-canvas) 68%, transparent) 58%,
-    color-mix(in oklch, var(--color-canvas) 26%, transparent) 76%,
-    transparent 92%
+    color-mix(in oklch, var(--color-canvas) 97%, transparent) 28%,
+    color-mix(in oklch, var(--color-canvas) 90%, transparent) 44%,
+    color-mix(in oklch, var(--color-canvas) 72%, transparent) 58%,
+    color-mix(in oklch, var(--color-canvas) 26%, transparent) 74%,
+    transparent 90%
   );
 }
 
 @utility scrim-block {
-  /* Tuned against the muted prose colour, not the headline, and re-checked
-     after the rain opacity went up. `ink-muted` on the canvas already clears
-     4.5:1 with nothing behind it, so this only has to cover what the rain and
-     the depth field actually add — but "only" is not "barely", and the first
-     two passes were legible-but-busy rather than legible-and-clean. The eye
-     parses a dense moving field as information and stops reading the prose. */
+  /* Against a near-black base this is doing much less work than it was. Lighter
+     than the previous calibration, because the surface underneath is now dark
+     enough that additive green reads as glow rather than as clutter — the goal
+     is not to hide the field but to keep the text column legible in front of
+     it. */
   background-image: linear-gradient(
     to bottom,
-    color-mix(in oklch, var(--color-canvas) 82%, transparent) 0%,
-    color-mix(in oklch, var(--color-canvas) 74%, transparent) 26%,
-    color-mix(in oklch, var(--color-canvas) 68%, transparent) 58%,
-    color-mix(in oklch, var(--color-canvas) 78%, transparent) 100%
+    color-mix(in oklch, var(--color-canvas) 62%, transparent) 0%,
+    color-mix(in oklch, var(--color-canvas) 48%, transparent) 26%,
+    color-mix(in oklch, var(--color-canvas) 38%, transparent) 58%,
+    color-mix(in oklch, var(--color-canvas) 56%, transparent) 100%
   );
 }
 

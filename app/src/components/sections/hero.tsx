@@ -123,7 +123,9 @@ export function Hero() {
       // Opts out of the sequence numbering: the hero is the top of the document,
       // so calling it "section 01" is a lie about where it is.
       data-scroll-index="off"
-      className="relative flex min-h-[92svh] flex-col justify-end pb-[clamp(2.5rem,6vw,4.5rem)] pt-32"
+      // `overflow-clip` as a backstop for the local scrim below, which is
+      // wider than the prose it sits behind.
+      className="relative flex min-h-[92svh] flex-col justify-end overflow-clip pb-[clamp(2.5rem,6vw,4.5rem)] pt-32"
     >
       {/* Legibility scrim. The rain is additive light running behind the
           headline, so this guarantees the contrast ratio holds on every frame
@@ -148,7 +150,11 @@ export function Hero() {
 
         <h1
           ref={headlineRef}
-          className="display max-w-[16ch] text-balance"
+          // `relative z-10` so the local scrim below cannot paint over the
+          // headline. An absolutely-positioned sibling with `z-index: 0` is
+          // painted after in-flow content, so it was dimming the headline's
+          // lower lines even though every word's computed colour was identical.
+          className="display relative z-10 max-w-[16ch] text-balance"
           aria-label={site.headline.claim}
         >
           {site.headline.claim}
@@ -157,7 +163,32 @@ export function Hero() {
         {/* Two widths, deliberately. The headline runs the shell; everything
             below caps at prose measure and stays left-aligned. */}
         <div className="mt-[clamp(1.75rem,4vw,3rem)] grid gap-[clamp(1.5rem,3vw,3rem)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <Reveal from="lift" delay={0.1} className="lede prose-measure block">
+          {/* Local scrim behind the hero paragraph specifically.
+              Dimming the rain field further to clear 4.5:1 on the worst frame
+              was measured at costing the effect everywhere on the page for a
+              0.25 contrast gain. This is the better lever: a soft elliptical
+              fade in the canvas colour, sized to the paragraph and invisible
+              against an already-near-black base, which removes the rain from
+              behind this block of text only.
+
+              `z-0` rather than a negative z-index. The WebGL canvas is
+              `fixed` at `-z-10`, so a negative value here competes with it and
+              the scrim renders behind the scene — which is exactly what the
+              first attempt did, and why it changed the measurement by 0.06.
+
+              Width is capped at 80%: the paragraph occupies about 72% of the
+              grid row, and a wider scrim pushed past the shell and added
+              448px of horizontal overflow at 1280px. The section clips as a
+              backstop regardless. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-0 z-0 h-[220%] w-[80%] -translate-y-1/2"
+            style={{
+              background:
+                "radial-gradient(58% 50% at 42% 50%, var(--color-canvas) 0%, color-mix(in oklab, var(--color-canvas) 90%, transparent) 42%, transparent 70%)",
+            }}
+          />
+          <Reveal from="lift" delay={0.1} className="lede prose-measure relative z-10 block">
             {site.headline.sub}
           </Reveal>
 

@@ -15,6 +15,22 @@ uniform float uDither;
 uniform float uFrozen;
 uniform float uScroll;
 uniform float uVelocity;
+/**
+ * Reading-column attenuation bounds, in 0..1 screen UV.
+ *
+ * The CSS scrim is not sufficient on its own. Measured across eight frames of
+ * the hero, the scrim gave a *typical* body contrast of 8.09:1 but a worst case
+ * of 1.72:1, because a bright rain head still landed behind the prose and the
+ * bloom smeared it. A gradient cannot fix that — only making the field dimmer
+ * where the text actually is.
+ *
+ * These are measured positions, not guesses. The hero paragraph's bounding box
+ * reaches x = 0.61 of the viewport at 1600px wide, and an earlier guard ramped
+ * from 0.19 to 0.62 — so it was at ~99% strength exactly where the text ends,
+ * which is precisely why it changed nothing.
+ */
+uniform float uGuardStart;
+uniform float uGuardEnd;
 uniform vec3  uColorHead;
 uniform vec3  uColorTail;
 uniform sampler2D uAtlas;
@@ -93,6 +109,22 @@ void main() {
   // continuous while restoring a real gradient from head to tail.
   float amount = pow(clamp(brightness, 0.0, 1.0), 0.42);
   amount = mix(amount, min(amount + 0.9, 1.0), isHead * uHeadBoost);
+
+  // Reading-column attenuation, applied as TWO curves rather than one.
+  //
+  // Dimming the whole field was the obvious lever and it is the wrong one: it
+  // forces the entire left half of the screen to go flat, which is exactly the
+  // thing the brighter base was meant to fix.
+  //
+  // What actually breaks contrast is not the field — it is the bright *head*
+  // cell. Measured, the head is what pushed the worst frame under threshold,
+  // and the trail is dim enough to sit behind text without hurting it. So the
+  // trail keeps a gentle attenuation and the head gets an aggressive one. The
+  // result reads as rain texture running the full width of the viewport, with
+  // the glowing heads confined to the open right-hand side.
+  float trailGuard = mix(0.06, 1.0, smoothstep(uGuardStart, uGuardEnd, vUv.x));
+  float headGuard  = mix(0.02, 1.0, smoothstep(uGuardStart + 0.06, uGuardEnd, vUv.x));
+  amount *= mix(trailGuard, headGuard, isHead * uHeadBoost);
 
   vec3 color = mix(uColorTail, uColorHead, isHead * uHeadBoost + amount * 0.3);
   color *= amount;
