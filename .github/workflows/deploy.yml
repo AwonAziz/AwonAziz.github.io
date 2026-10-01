@@ -1,26 +1,28 @@
 # ---------------------------------------------------------------------------
-#  GitHub Pages deploy
+#  Build check
 # ---------------------------------------------------------------------------
-#  Two things happen here, and the order matters:
+#  This runs the full quality gate on every push and pull request:
+#  lint -> typecheck -> build. A failing type error is caught here rather than
+#  on the live site, which is the entire value of this workflow.
 #
-#  1. `app/` is built and quality-gated — lint, then typecheck, then the actual
-#     build. A failing type error never reaches the deploy step, so a broken
-#     push cannot ship. This is the same gate that caught a production-only
-#     ZodError during the first deploy.
+#  It deliberately does NOT publish.
 #
-#  2. The built site is copied to the repository root and committed back.
+#  Publishing is a manual step (`./publish.ps1` on Windows, `./publish.sh` on
+#  anything else) because GitHub Pages on this repo is configured as
+#  "Deploy from a branch" (main/root) with Jekyll, which cannot be changed
+#  without repo admin access. An automated job that commits back to `main` needs
+#  write scope to a branch that Pages may well have protected, and when that
+#  push is rejected the only symptom is a red check that says nothing useful.
 #
-#  Step 2 is not the usual pattern, and it exists for a specific reason: Pages
-#  here is configured to deploy `main/root` as a branch build with Jekyll, which
-#  cannot be changed without repo admin access. A Jekyll branch build serves
-#  whatever is at the root, so the built site has to *be* at the root. Flipping
-#  the setting to "GitHub Actions" (Settings -> Pages -> Source) lets step 2 be
-#  deleted and the `actions/deploy-pages` artifact path used directly.
+#  Two commits confirmed this: the job built and gated successfully, then failed
+#  on `git push origin HEAD:main`, with the log endpoint returning 403 so the
+#  reason could not be read.
 #
-#  The skip-ci marker on the commit is not optional. Without it the commit this
-#  workflow makes would re-trigger the workflow that made it.
+#  If you switch Settings -> Pages -> Source to "GitHub Actions", this can be
+#  replaced with the actions/deploy-pages artifact flow, which needs no write
+#  permission to `main` at all. That is the better setup and it is one click.
 # ---------------------------------------------------------------------------
-name: Build and publish
+name: Build check
 
 on:
   push:
@@ -30,12 +32,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
-# Never two publishers racing for the root.
+# Cancel superseded runs on the same ref. Unlike a deploy, a stale build check
+# has no value once a newer commit exists.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -63,50 +66,9 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # An unset Actions variable arrives as an empty string, not as
-          # omitted, and an empty string is not a valid URL — the content schema
-          # rejects it and the deployed page dies before it mounts.
+          # An unset Actions variable arrives as an empty string rather than
+          # being omitted, and an empty string is not a valid URL. The content
+          # schema rejects it and the built site throws a ZodError before the
+          # app mounts. That is not hypothetical - it is what the first deploy
+          # did.
           VITE_SITE_URL: ${{ vars.VITE_SITE_URL || 'https://awonaziz.github.io' }}
-
-      # Publish only from the default branch, and only on a real push. Pull
-      # requests still get the full quality gate above.
-      - name: Publish to repository root
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          set -euo pipefail
-          root="$(git rev-parse --show-toplevel)"
-
-          # Replace the deployed artefacts wholesale so a renamed or deleted
-          # file cannot survive from a previous deploy.
-          rm -rf "$root/assets"
-          cp -r app/dist/assets "$root/assets"
-          cp app/dist/index.html "$root/index.html"
-
-          # Each of these is optional, and this must be written as an `if`
-          # rather than as `[ -e x ] && cp ...`. Under `set -e` a failing test
-          # makes the whole `&&` chain return non-zero and aborts the step — so
-          # the one-line idiom silently fails the job the first time any file is
-          # absent, which is exactly what happened on the first run.
-          for file in .nojekyll favicon.svg robots.txt sitemap.xml _headers _redirects; do
-            if [ -e "app/dist/$file" ]; then
-              cp "app/dist/$file" "$root/$file"
-            else
-              echo "skipping $file (not in build output)"
-            fi
-          done
-
-          cd "$root"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- assets index.html favicon.svg robots.txt sitemap.xml _headers _redirects .nojekyll
-
-          if git diff --cached --quiet; then
-            echo "No change to publish."
-            exit 0
-          fi
-
-          git commit -m "chore: publish build [skip ci]"
-          # Only ever fast-forward: this job runs on a fresh checkout whose
-          # HEAD is the commit that triggered it, so a non-fast-forward here
-          # means someone pushed concurrently and the next run will reconcile.
-          git push origin HEAD:main
