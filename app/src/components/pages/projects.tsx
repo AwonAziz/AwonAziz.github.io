@@ -180,14 +180,14 @@ export function ProjectDetail() {
           No system by that name.
         </h1>
         <p className="prose prose-measure">
-          The link may be from an older version of the site. The full index is{" "}
+          The link may be from an older version of the site. The{" "}
           <a
             className="text-ink underline decoration-accent/50 underline-offset-4"
-            href="./projects.html"
+            href="./projects/"
           >
-            here
-          </a>
-          .
+            systems index
+          </a>{" "}
+          has all of them.
         </p>
       </div>
     );
