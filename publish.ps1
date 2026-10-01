@@ -77,6 +77,14 @@ $assets = Join-Path $root "assets"
 if (Test-Path $assets) { Remove-Item -Recurse -Force $assets }
 Copy-Item -Recurse -Force (Join-Path $dist "assets") $assets
 
+# Route directories. Each is a real page with its own index.html, so they are
+# published the same way the root is rather than referenced as SPA routes.
+foreach ($dir in @("projects", "project")) {
+    $target = Join-Path $root $dir
+    if (Test-Path $target) { Remove-Item -Recurse -Force $target }
+    Copy-Item -Recurse -Force (Join-Path $dist $dir) $target
+}
+
 $files = @("index.html", ".nojekyll", "favicon.svg", "robots.txt", "sitemap.xml", "_headers", "_redirects")
 foreach ($file in $files) {
     $src = Join-Path $dist $file
@@ -92,7 +100,7 @@ foreach ($file in $files) {
 Push-Location $root
 try {
     $ErrorActionPreference = "Continue"
-    git add -A -- assets index.html favicon.svg robots.txt sitemap.xml _headers _redirects .nojekyll
+    git add -A -- assets projects project index.html favicon.svg robots.txt sitemap.xml _headers _redirects .nojekyll
 
     # PowerShell does NOT coerce a native command's exit code to a boolean, so
     # `if (git diff --quiet)` tests the command's *output* - which is nothing,
