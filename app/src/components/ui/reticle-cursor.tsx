@@ -48,25 +48,45 @@ export function ReticleCursor() {
     const ring = ringRef.current;
     if (!dot || !ring) return;
 
-    // Two speeds: the dot tracks almost exactly so clicking feels accurate, and
-    // the reticle lags behind it so the page has weight.
-    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const lead = { ...target };
-    const trail = { ...target };
+    // Two speeds, with distinct roles and distinct names.
+    //
+    //   lead  eases toward the real pointer quickly, so clicking feels accurate
+    //   trail eases toward `lead` slowly, so the page has weight
+    //
+    // These read `pointer.clientX / clientY` — viewport pixels. An earlier
+    // version read `ndcX / ndcY`, which are -1..1 with Y positive upward, and
+    // scaled them by half the viewport while negating Y. The result tracked the
+    // pointer backwards on both axes: mouse up, cursor down.
+    const lead = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const trail = { ...lead };
     let frame = 0;
+    let last = performance.now();
 
     const tick = () => {
-      lead.x += (pointer.ndcX * (window.innerWidth / 2) - lead.x) * 0.5;
-      lead.y += (-pointer.ndcY * (window.innerHeight / 2) - lead.y) * 0.5;
-      trail.x += (target.x - lead.x) * 0.14;
-      trail.y += (target.y - lead.y) * 0.14;
-      target.x = lead.x;
-      target.y = lead.y;
+      const now = performance.now();
+      // This is a DOM component, not an R3F one, so there is no delta in the
+      // rAF callback — it is measured here. A fixed per-frame lerp coefficient
+      // would make the lag depend on the refresh rate, so the cursor would feel
+      // different on a 60Hz laptop than on a 144Hz monitor.
+      const ms = Math.min(now - last, 48);
+      last = now;
 
-      dot.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0)`;
-      ring.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) scale(${
-        active ? 1.35 : 1
-      })`;
+      // Convert the elapsed time into the equivalent of a per-16.67ms step, so
+      // the easing curve behaves identically at any frame rate.
+      const follow = 1 - (1 - 0.55) ** (ms / 16.67);
+      const lag = 1 - (1 - 0.16) ** (ms / 16.67);
+
+      lead.x += (pointer.clientX - lead.x) * follow;
+      lead.y += (pointer.clientY - lead.y) * follow;
+      trail.x += (lead.x - trail.x) * lag;
+      trail.y += (lead.y - trail.y) * lag;
+
+      const scale = active ? 1.35 : 1;
+      for (const el of [dot, ring]) {
+        if (!el) continue;
+        el.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0)`;
+      }
+      ring.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) scale(${scale})`;
 
       frame = requestAnimationFrame(tick);
     };

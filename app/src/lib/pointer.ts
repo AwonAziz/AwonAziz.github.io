@@ -7,14 +7,24 @@
  *  either allocate or re-render. The event listener is registered once, at
  *  module scope, and never torn down.
  *
- *  Coordinates are tracked twice because they are needed in two different
- *  spaces: normalised device coordinates for anything in clip space, and world
- *  XZ for the depth field's repulsion.
+ *  Coordinates are tracked in three spaces because three consumers need
+ *  different ones, and mixing them up is not a subtle error — the reticle
+ *  cursor did exactly that and tracked the pointer *backwards*:
+ *
+ *    clientX / clientY  viewport pixels. Anything positioned with
+ *                      `position: fixed` and a transform wants these.
+ *    ndcX / ndcY        -1..1, origin centre, **Y positive upward**. Only
+ *                      for clip-space work.
+ *    worldX / worldY    an approximate plane projection, for the depth
+ *                      field's GPU-side repulsion.
  * ---------------------------------------------------------------------------
  */
 
 export interface PointerState {
-  /** -1..1 across the viewport, origin centre. */
+  /** Viewport pixels, origin top-left. For DOM positioning. */
+  clientX: number;
+  clientY: number;
+  /** -1..1 across the viewport, origin centre, Y positive upward. */
   ndcX: number;
   ndcY: number;
   /** World-space XZ, for GPU-side repulsion. */
@@ -26,6 +36,8 @@ export interface PointerState {
 }
 
 export const pointer: PointerState = {
+  clientX: 0,
+  clientY: 0,
   ndcX: 0,
   ndcY: 0,
   worldX: 0,
@@ -35,8 +47,10 @@ export const pointer: PointerState = {
 };
 
 if (typeof window !== "undefined") {
-  let lastX = 0;
-  let lastY = 0;
+  let lastClientX = 0;
+  let lastClientY = 0;
+  let lastNdcX = 0;
+  let lastNdcY = 0;
   let lastMove = 0;
 
   const onMove = (event: PointerEvent) => {
@@ -44,8 +58,11 @@ if (typeof window !== "undefined") {
     // running the maths anyway is wasted work on the most constrained device.
     if (event.pointerType === "touch") return;
 
-    lastX = (event.clientX / window.innerWidth) * 2 - 1;
-    lastY = -((event.clientY / window.innerHeight) * 2 - 1);
+    lastClientX = event.clientX;
+    lastClientY = event.clientY;
+    lastNdcX = (event.clientX / window.innerWidth) * 2 - 1;
+    // Negated because NDC has Y positive upward while pixels have it downward.
+    lastNdcY = -((event.clientY / window.innerHeight) * 2 - 1);
     lastMove = performance.now();
     pointer.raw = 1;
   };
@@ -63,13 +80,15 @@ if (typeof window !== "undefined") {
 
   /** World projection runs from a rAF rather than on every move event. */
   const project = () => {
-    pointer.ndcX = lastX;
-    pointer.ndcY = lastY;
+    pointer.clientX = lastClientX;
+    pointer.clientY = lastClientY;
+    pointer.ndcX = lastNdcX;
+    pointer.ndcY = lastNdcY;
     // Roughly maps NDC onto the plane the field lives on. An exact projection
     // would need the camera matrix here, and a `useFrame` write is cheaper than
     // a second subscription.
-    pointer.worldX = lastX * 7;
-    pointer.worldY = lastY * 4;
+    pointer.worldX = lastNdcX * 7;
+    pointer.worldY = lastNdcY * 4;
 
     // 4s of stillness decays the field's response, so a mouse left parked in
     // the middle of the page does not hold the particles permanently displaced.
