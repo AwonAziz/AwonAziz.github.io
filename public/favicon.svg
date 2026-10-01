@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="favicon-title">
+  <title id="favicon-title">Awon Aziz</title>
+  <rect width="32" height="32" rx="7" fill="#0a1211" />
+  <text
+    x="16"
+    y="22.5"
+    text-anchor="middle"
+    font-family="ui-monospace, 'Geist Mono', monospace"
+    font-size="19"
+    font-weight="700"
+    fill="#17d97c"
+  >A</text>
+</svg>

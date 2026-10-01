@@ -1,0 +1,533 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   Design system
+   ===========================================================================
+   Three type families, each with one job. This is the Siena Film Foundation
+   shape (grotesque display, quiet body, mono metadata) and it is deliberate:
+
+   - **Space Grotesk** for display and UI. A proportional cut of Space Mono,
+     tuned for non-display sizes. It keeps the technical letterforms without
+     being the Space Mono costume that every "developer aesthetic" reaches for.
+   - **Newsreader** for prose. A variable serif. The reason is not aesthetic —
+     it is that a long-form serif reads as a *hiring document*, which is what
+     this page is. Most developer portfolios are set entirely in a grotesque and
+     end up reading as a landing page.
+   - **Geist Mono** for values. Counts, timestamps, versions, paths, metric
+     keys — never a sentence. The pattern from every real system that uses mono
+     is that mono never carries prose; it labels data. Since the numbers here are
+     genuinely tabular (and often runtime-measured), mono plus tabular figures is
+     the honest setting, not a decorative one.
+
+   The page background is on `html`, not `body`. The WebGL canvas is a negative-z
+   child of `<body>`, so an opaque `body` background hides the entire scene.
+   =========================================================================== */
+
+@theme {
+  /* -- surfaces -------------------------------------------------------
+     Near-black with a cyan-green cast. Deliberately low lightness: the rain is
+     additive light, and any lift in the base would crush the contrast between
+     the glyphs and the page. Neutrals are anchored slightly toward the accent
+     hue so the greys read as part of the same lit system. */
+  --color-canvas: oklch(0.148 0.008 178);
+  --color-canvas-raised: oklch(0.196 0.01 178);
+  --color-canvas-sunken: oklch(0.112 0.006 178);
+  --color-ink: oklch(0.975 0.004 150);
+  --color-ink-muted: oklch(0.8 0.012 178);
+  --color-ink-faint: oklch(0.638 0.014 178);
+
+  /* -- accents --------------------------------------------------------
+     One accent. The rain's trail, the status dot, the nav marker, the primary
+     button and the focus ring are all this green, so the page reads as one lit
+     system rather than a set of independently chosen colours.
+     oklch(0.855) on oklch(0.148) measures about 10.9:1, which clears every
+     threshold here with room to spare. */
+  --color-accent: oklch(0.855 0.185 152);
+  --color-accent-soft: oklch(0.855 0.185 152 / 0.13);
+  /* Status only, never decoration: healthy / degraded / down. */
+  --color-warn: oklch(0.83 0.15 88);
+  --color-fail: oklch(0.68 0.2 25);
+
+  /* -- type -----------------------------------------------------------
+     Space Grotesk carries display and UI. Newsreader carries prose. Geist Mono
+     carries values, and nothing else. */
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader", ui-serif, Georgia, serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+
+  /* -- type scale -----------------------------------------------------
+     Fluid, Utopia-style: each step breathes roughly 6% between 320px and
+     1240px rather than snapping at breakpoints. A modular scale makes the
+     hierarchy look accidental at large sizes; this keeps the ratio visible
+     all the way down. */
+  --text-display: clamp(2.75rem, 1rem + 7.2vw, 7.5rem);
+  --text-display--line-height: 0.94;
+  --text-display--letter-spacing: -0.035em;
+
+  --text-title: clamp(1.875rem, 1rem + 3.1vw, 3.5rem);
+  --text-title--line-height: 1.04;
+  --text-title--letter-spacing: -0.028em;
+
+  --text-lead: clamp(1.0625rem, 0.95rem + 0.45vw, 1.375rem);
+  --text-lead--line-height: 1.55;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.5;
+
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.33;
+  --text-label--letter-spacing: 0.09em;
+
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.45;
+  --text-micro--letter-spacing: 0.1em;
+
+  /* -- radius ----------------------------------------------------------
+     Two values and a pill. A long radius scale is a symptom of not deciding. */
+  --radius-card: 0.75rem;
+  --radius-pill: 999px;
+
+  /* -- motion ----------------------------------------------------------
+     One ease for entrances, one for exits, one for ambient. Exits are faster
+     than entrances because a delayed dismissal reads as lag. */
+  --ease-enter: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-exit: cubic-bezier(0.5, 0, 0.75, 0);
+  --ease-ambient: cubic-bezier(0.66, 0, 0, 1);
+}
+
+/* ===========================================================================
+   Base
+   =========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: color-mix(in oklab, var(--color-ink) 10%, transparent);
+  }
+
+  html {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+    /* Unconditional, not breakpoint-scoped: a deep-linked anchor must never
+       land under the sticky header. */
+    scroll-padding-block-start: 6rem;
+  }
+
+  body {
+    background-color: transparent;
+    font-family: var(--font-serif);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    /* 24px baseline grid. Section spacing is a multiple of this, which is what
+       stops long pages drifting out of rhythm. */
+    --baseline: 1.5rem;
+    color: var(--color-ink-muted);
+    overflow-x: clip;
+  }
+
+  /* Space Grotesk everywhere structural; the serif is scoped to prose. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  nav,
+  header,
+  button,
+  label,
+  dt,
+  th,
+  code,
+  pre {
+    font-family: var(--font-display);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-canvas);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-canvas-sunken);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.32 0.012 178);
+    border-radius: 999px;
+    border: 3px solid var(--color-canvas-sunken);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent);
+  }
+}
+
+/* ===========================================================================
+   Layout
+   ===========================================================================
+   Two widths, deliberately decoupled.
+
+   The **shell** is the section width — headings and the wordmark align to it.
+   The **prose** cap moves one level down and applies only to running text, at
+   68ch and LEFT aligned. Centring prose inside a wide box is the single thing
+   that most makes technical pages feel unconsidered, and left-aligning it under
+   a full-width heading makes a long page read as one left edge with a ragged
+   right rather than as a column floating in a box.
+
+   Vertical rhythm is 64 / 96 on desktop. 32 is banned at this scale because it
+   is the value that flattens both ends of the range.
+   =========================================================================== */
+
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 90rem;
+  padding-inline: clamp(1.25rem, 4vw, 4rem);
+}
+
+@utility prose-measure {
+  max-width: 68ch;
+}
+
+/** Section rhythm. */
+@utility section-pad {
+  padding-block: clamp(4rem, 9vw, 8rem);
+}
+
+/**
+ * 1px rails down both edges of the document.
+ *
+ * Two pixels of layout for a structural signal: they hold the whole grid
+ * together across 20,000px and make every section read as one continuous
+ * surface instead of a pile of boxes.
+ */
+@utility page-rails {
+  position: relative;
+}
+
+@utility display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  line-height: var(--text-display--line-height);
+  letter-spacing: var(--text-display--letter-spacing);
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+@utility title {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  line-height: var(--text-title--line-height);
+  letter-spacing: var(--text-title--letter-spacing);
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+/** Prose. The serif only ever appears here and in lede paragraphs. */
+@utility lede {
+  font-family: var(--font-serif);
+  font-size: var(--text-lead);
+  line-height: var(--text-lead--line-height);
+  color: var(--color-ink-muted);
+  text-wrap: pretty;
+}
+
+@utility prose {
+  font-family: var(--font-serif);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-ink-muted);
+}
+
+/** Mono label. Uppercase, tracked, faint. The workhorse of the whole page. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  letter-spacing: var(--text-micro--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+/**
+ * A measured value.
+ *
+ * `tabular-nums` is not decorative here. These strings change in place as the
+ * feed refreshes, and proportional figures make the whole column twitch. Mono
+ * plus tabular figures is the honest setting for a number that is data.
+ */
+@utility value-mono {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+/* ===========================================================================
+   Surfaces
+   =========================================================================== */
+
+@utility glass {
+  background-color: color-mix(in oklab, var(--color-canvas-raised) 78%, transparent);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--color-ink) 10%, transparent);
+}
+
+@utility card {
+  background-color: var(--color-canvas-raised);
+  border: 1px solid color-mix(in oklab, var(--color-ink) 10%, transparent);
+  border-radius: var(--radius-card);
+}
+
+/**
+ * Status dot. Colour carries the state; nothing else about it does.
+ * `white/6%` borders fail APCA's Lc 15 floor, so hairlines sit at 10%+.
+ */
+@utility status-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background-color: var(--color-ink-faint);
+  flex: none;
+}
+
+@utility status-ok {
+  background-color: var(--color-accent);
+}
+
+@utility status-warn {
+  background-color: var(--color-warn);
+}
+
+@utility status-fail {
+  background-color: var(--color-fail);
+}
+
+/* ===========================================================================
+   Legibility
+   ===========================================================================
+   Not decorative gradients. A full-viewport animated background running behind
+   body copy is a real accessibility problem: 1.4.3 measures contrast against
+   "the background behind the text", and that background is now moving, so the
+   ratio depends on whether a bright glyph happens to be passing behind a word at
+   the moment it is read.
+
+   The fix is not to dim the effect enough on average — it is to make the text
+   region *unconditionally* legible. These sit between the canvas and the
+   content so the ratio holds on every frame rather than usually holding.
+
+   1.4.3 itself does not apply to the rain glyphs: decorative text that could be
+   rearranged or substituted without changing meaning is explicitly exempt.
+   Tuned against the muted prose colour, not the headline.
+   =========================================================================== */
+
+@utility scrim-left {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-canvas) 0%,
+    color-mix(in oklch, var(--color-canvas) 90%, transparent) 24%,
+    color-mix(in oklch, var(--color-canvas) 64%, transparent) 44%,
+    color-mix(in oklch, var(--color-canvas) 26%, transparent) 64%,
+    color-mix(in oklch, var(--color-canvas) 7%, transparent) 82%,
+    transparent 100%
+  );
+}
+
+@utility scrim-block {
+  /* Tuned against the muted prose colour, not the headline.
+     `ink-muted` on the canvas already clears 4.5:1 with nothing behind it, so
+     this only needs to cover what the rain and the depth field actually add.
+     The first pass at 36% in the middle was legible but read as busy — the eye
+     parses a dense moving field as information and stops reading the prose. */
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in oklch, var(--color-canvas) 74%, transparent) 0%,
+    color-mix(in oklch, var(--color-canvas) 62%, transparent) 26%,
+    color-mix(in oklch, var(--color-canvas) 56%, transparent) 58%,
+    color-mix(in oklch, var(--color-canvas) 70%, transparent) 100%
+  );
+}
+
+/**
+ * Scroll edge fade.
+ *
+ * A `mask-image` gradient at a container's top and bottom edges. It dissolves a
+ * hard section boundary — the opposite of a border — and hints that more exists
+ * without drawing a control. Cheapest high-impact item in the layout kit.
+ */
+@utility edge-fade {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black 5rem,
+    black calc(100% - 5rem),
+    transparent 100%
+  );
+}
+
+/* ===========================================================================
+   Animation
+   ===========================================================================
+   Two systems with a hard boundary between them.
+
+   GSAP + ScrollTrigger owns anything that needs a shared clock: text splitting,
+   pinning, orchestration, anything with a callback. CSS scroll-driven
+   animations own everything else — parallax, progress rules, edge reveals —
+   because they run on the compositor with deterministic frame timing and no
+   main-thread cost at all.
+
+   The split matters for INP: the WebGL layer is GPU fill and does not block
+   input, so the main thread is only left with the DOM work. Handing secondary
+   motion to the compositor keeps it that way.
+   =========================================================================== */
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@utility animate-drift {
+  animation: drift var(--duration, 40s) linear infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@utility animate-pulse-dot {
+  animation: pulse-dot 2.4s var(--ease-ambient) infinite;
+}
+
+@keyframes caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@utility animate-caret {
+  animation: caret 1.06s steps(1) infinite;
+}
+
+/**
+ * Native scroll-driven animations.
+ *
+ * Gated behind `@supports` rather than used unconditionally, because these read
+ * the *real* scroll position. Lenis 1.3 drives real scroll by default (not a
+ * transform wrapper), so they track correctly — but that is a load-bearing
+ * assumption, so the Runtime panel reports the detected support rather than
+ * leaving it to be discovered.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-fade-in {
+      animation: scroll-fade-in linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 32%;
+    }
+
+    .scroll-rule {
+      animation: scroll-rule linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes scroll-fade-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes scroll-rule {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ===========================================================================
+   Reduced motion
+   ===========================================================================
+   The preference is honoured by removing motion rather than by shortening it,
+   and the rain freezes to a single frame instead of blanking — a static field
+   still reads as intentional, an empty black canvas reads as broken.
+   =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-drift {
+    animation: none;
+  }
+}

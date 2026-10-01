@@ -1,0 +1,20 @@
+# Normalise line endings.
+#
+# The repo is built on Windows and deployed by a Linux runner, so without this
+# every checkout produces a full-file diff of CRLF/LF churn and the GLSL
+# sources end up with mixed endings. `eol=lf` is also what GitHub Pages and
+# Cloudflare both expect.
+* text=auto eol=lf
+
+# Shell scripts must stay LF or they fail on a Linux runner with a shebang error.
+*.sh text eol=lf
+
+# Lockfiles are generated; never normalise them or diffs become unreadable.
+package-lock.json -diff linguist-generated=true
+
+# Binary / non-text
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff binary
+*.woff2 binary
