@@ -1,5 +1,6 @@
 import { site } from "@/config/site.data";
 import { Section } from "../section";
+import { Magnetic } from "../ui/magnetic";
 import { Reveal } from "../ui/reveal";
 
 /**
@@ -44,24 +45,29 @@ export function Contact() {
             {site.contact.note}
           </Reveal>
 
-          <a
-            href={`mailto:${site.contact.email}?subject=${encodeURIComponent("AI / MLOps role")}`}
-            className="group mt-10 inline-flex items-center gap-3 rounded-pill bg-accent px-7 py-4 font-mono text-small font-medium text-canvas transition-transform hover:scale-[1.02]"
-          >
-            {site.contact.cta}
-            <svg
-              viewBox="0 0 24 24"
-              className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          <Magnetic strength={0.3} padding={80} className="mt-10 inline-block">
+            <a
+              href={`mailto:${site.contact.email}?subject=${encodeURIComponent(
+                "AI / MLOps role — Python, Kubernetes, drift detection",
+              )}`}
+              data-cursor-label="Write"
+              className="group inline-flex items-center gap-3 rounded-pill bg-accent px-7 py-4 font-mono text-small font-medium text-canvas"
             >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </a>
+              {site.contact.cta}
+              <svg
+                viewBox="0 0 24 24"
+                className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+          </Magnetic>
         </div>
 
         <ul className="flex flex-col gap-px overflow-hidden rounded-card border border-white/10 bg-white/10">

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Site } from "@/components/site";
 import { useSeo } from "@/hooks/use-seo";
 
@@ -26,12 +26,38 @@ const LazyScene = lazy(() =>
  */
 export function App() {
   useSeo();
+  const [sceneReady, setSceneReady] = useState(false);
+
+  /**
+   * Wait for `load` before mounting the canvas at all.
+   *
+   * Lazy *loading* the chunk is only half the story: creating the WebGL context
+   * and compiling the shaders is still main-thread work, and compilation in
+   * particular routinely costs hundreds of milliseconds. Doing that during
+   * startup queues every click and scroll arriving in the meantime, and that
+   * queued delay is precisely what INP measures. This is the step most WebGL
+   * sites skip.
+   *
+   * `load` rather than a timeout, so a slow font or image still wins. The
+   * listener is removed once it fires so it does not outlive the page.
+   */
+  useEffect(() => {
+    if (document.readyState === "complete") {
+      setSceneReady(true);
+      return;
+    }
+    const onLoad = () => setSceneReady(true);
+    window.addEventListener("load", onLoad, { once: true });
+    return () => window.removeEventListener("load", onLoad);
+  }, []);
 
   return (
     <>
-      <Suspense fallback={null}>
-        <LazyScene />
-      </Suspense>
+      {sceneReady ? (
+        <Suspense fallback={null}>
+          <LazyScene />
+        </Suspense>
+      ) : null}
       <Site />
     </>
   );

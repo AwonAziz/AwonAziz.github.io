@@ -5,6 +5,8 @@ import { cn } from "@/lib/cn";
 import { motionBlocked } from "@/lib/motion-prefs";
 import { gsap, SplitText } from "@/providers/smooth-scroll";
 import { DecodeText } from "../ui/decode-text";
+import { Magnetic } from "../ui/magnetic";
+import { VelocityMarquee } from "../ui/marquee";
 import { Reveal } from "../ui/reveal";
 
 /**
@@ -193,34 +195,38 @@ export function Hero() {
           </Reveal>
 
           <div data-hero-fade className="flex flex-wrap items-center gap-3">
-            <a
-              href="#systems"
-              data-cursor-label="Read"
-              className="group inline-flex items-center gap-3 rounded-pill bg-accent px-6 py-3.5 font-mono text-small font-medium text-canvas transition-transform hover:scale-[1.03]"
-            >
-              {site.headline.ctaPrimary}
-              <svg
-                viewBox="0 0 24 24"
-                className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+            <Magnetic strength={0.26} padding={70}>
+              <a
+                href="#systems"
+                data-cursor-label="Read"
+                className="group inline-flex items-center gap-3 rounded-pill bg-accent px-6 py-3.5 font-mono text-small font-medium text-canvas"
               >
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </a>
+                {site.headline.ctaPrimary}
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+            </Magnetic>
 
-            <a
-              href="#runtime"
-              data-cursor-label="Live"
-              className="inline-flex items-center gap-2.5 rounded-pill border border-white/12 px-6 py-3.5 font-mono text-small text-ink-muted transition-colors duration-300 hover:border-accent/50 hover:text-ink"
-            >
-              <span aria-hidden="true" className="status-dot status-ok animate-pulse-dot" />
-              {site.headline.ctaSecondary}
-            </a>
+            <Magnetic strength={0.26} padding={70}>
+              <a
+                href="#runtime"
+                data-cursor-label="Live"
+                className="inline-flex items-center gap-2.5 rounded-pill border border-white/12 px-6 py-3.5 font-mono text-small text-ink-muted transition-colors duration-300 hover:border-accent/50 hover:text-ink"
+              >
+                <span aria-hidden="true" className="status-dot status-ok animate-pulse-dot" />
+                {site.headline.ctaSecondary}
+              </a>
+            </Magnetic>
           </div>
         </div>
 
@@ -251,27 +257,42 @@ export function Hero() {
  */
 export function SkillTicker() {
   return (
-    <div aria-hidden="true" className="relative border-y border-white/10 py-5">
+    <div aria-hidden="true" className="relative border-y border-white/10">
       <Reveal from="fade" immediate className="block">
-        <div className="flex overflow-hidden">
-          {[0, 1].map((copy) => (
-            <div
-              key={copy}
-              className="animate-drift flex shrink-0 items-center gap-10 pr-10"
-              style={{ ["--duration" as string]: "48s" }}
-            >
-              {site.marquee.map((item) => (
-                <span
-                  key={item}
-                  className="font-display text-[clamp(0.9375rem,1.6vw,1.25rem)] whitespace-nowrap tracking-tight text-ink/20"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
+        <VelocityMarquee
+          items={site.marquee}
+          // px/second of idle drift, and px of extra travel per px of scroll
+          // velocity. The second number is the point: the strip visibly
+          // accelerates and stalls with the page rather than running on a timer.
+          drift={16}
+          gain={0.45}
+          separator=""
+          className="py-6"
+        />
+        {/* Hairlines top and bottom, since the drift sits between them. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/10" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/10" />
       </Reveal>
+    </div>
+  );
+}
+
+/** Larger, mono-set marquee used between dense sections for rhythm. */
+export function FlowBand({ items, label }: { items: string[]; label?: string }) {
+  return (
+    <div className="relative border-y border-white/10 bg-canvas-sunken/40">
+      <VelocityMarquee
+        items={items}
+        drift={26}
+        gain={0.7}
+        separator="◆"
+        className="py-4 font-mono text-small tracking-tight text-ink/25"
+      />
+      {label ? (
+        <p className="label-mono pointer-events-none absolute top-1/2 left-6 -translate-y-1/2 bg-canvas-sunken/90 px-2">
+          {label}
+        </p>
+      ) : null}
     </div>
   );
 }

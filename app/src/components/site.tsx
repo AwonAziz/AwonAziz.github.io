@@ -4,7 +4,7 @@ import { Archive, Currently, Education } from "./sections/archive";
 import { CapabilityIndex } from "./sections/capability-index";
 import { Contact, Footer } from "./sections/contact";
 import { Faq } from "./sections/faq";
-import { Hero } from "./sections/hero";
+import { FlowBand, Hero } from "./sections/hero";
 import { Method } from "./sections/method";
 import { Runtime } from "./sections/runtime";
 import { Systems } from "./sections/systems";
@@ -65,6 +65,10 @@ export function Site() {
         <Hero />
         <StatsBand />
         <Systems />
+        {/* Rhythm break between two dense sections. The strip accelerates with
+            scroll velocity, so it also acts as a read-out of how fast the
+            reader is moving. */}
+        <FlowBand items={site.marquee} label="Stack, in use" />
         <Runtime />
         <CapabilityIndex />
         <Method />

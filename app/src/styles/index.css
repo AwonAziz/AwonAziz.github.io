@@ -122,9 +122,30 @@
     background-color: var(--color-canvas);
     color: var(--color-ink);
     -webkit-text-size-adjust: 100%;
-    /* Unconditional, not breakpoint-scoped: a deep-linked anchor must never
-       land under the sticky header. */
+    /* Unconditional, not breakpoint-scoped: a deep-linked anchor must never land
+       under the sticky header. Fixed-position chrome does not shrink the
+       viewport's optimal viewing region, so the header's height has to be added
+       to the scroll offset or every anchor lands underneath it.
+       6rem = 96px, which clears the 64px header plus its 20px offset.
+       The minimap rail needs no addition: it is vertically centred on the right
+       edge and never overlaps a section heading. */
     scroll-padding-block-start: 6rem;
+  }
+
+  :root {
+    /**
+     * Optical sizing.
+     *
+     * Newsreader ships an `opsz` axis (6..72), so body copy gets thick strokes
+     * and wide apertures at 16px while display type gets fine detail at 64px —
+     * automatically, and with no per-frame cost.
+     *
+     * The trap this avoids: ANY `font-variation-settings` declaration silently
+     * resets `opsz` to the font default, so a heading using it would render with
+     * caption-grade letterforms. There is none in the project; the standing
+     * rule is that headings use high-level `font-weight` only.
+     */
+    font-optical-sizing: auto;
   }
 
   body {

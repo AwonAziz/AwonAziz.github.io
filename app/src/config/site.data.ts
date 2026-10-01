@@ -5,14 +5,20 @@ import { type SiteConfig, validateSite } from "./schema";
  *
  * This is not defensive pedantry — it is a bug this project actually shipped.
  * GitHub Actions passes an unset repository variable through as `""`, not as
- * undefined, so `import.meta.env.VITE_SITE_URL ?? fallback` let the empty
- * string straight through to `z.url()`, which rejected it. The whole page died
- * on a ZodError in production while passing every local check.
+ * undefined, so `import.meta.env.VITE_SITE_URL ?? fallback` let the empty string
+ * straight through to `z.url()`, which rejected it. The whole page died on a
+ * ZodError in production while passing every local check.
  *
  * `||` rather than `??` is the whole fix.
+ *
+ * The `import.meta.env` guard is for the other direction: this module is also
+ * imported by `vite.config.ts` to generate static JSON-LD at build time, and Vite
+ * bundles its config in a context where `import.meta.env` does not exist.
+ * Throwing there would fail the whole build.
  */
 function env(name: string, fallback: string): string {
-  const value = import.meta.env[name];
+  const source = import.meta.env as Record<string, string | undefined> | undefined;
+  const value = source?.[name];
   return typeof value === "string" && value.trim() !== "" ? value.trim() : fallback;
 }
 
