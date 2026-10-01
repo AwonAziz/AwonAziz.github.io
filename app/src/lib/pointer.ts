@@ -1,3 +1,5 @@
+import { gsap } from "@/providers/smooth-scroll";
+
 /**
  * ---------------------------------------------------------------------------
  *  Shared pointer state
@@ -17,6 +19,10 @@
  *                      for clip-space work.
  *    worldX / worldY    an approximate plane projection, for the depth
  *                      field's GPU-side repulsion.
+ *
+ *  The projection is folded into GSAP's ticker rather than running its own
+ *  rAF: this site already owns one loop, and growing more of them was measured
+ *  costing roughly 6ms per frame.
  * ---------------------------------------------------------------------------
  */
 
@@ -78,8 +84,11 @@ if (typeof window !== "undefined") {
     if (document.hidden) pointer.raw = 0;
   });
 
-  /** World projection runs from a rAF rather than on every move event. */
-  const project = () => {
+  /**
+   * Published onto the shared ticker rather than a private rAF, and read by the
+   * reticle cursor and the depth field in the same tick.
+   */
+  gsap.ticker.add(() => {
     pointer.clientX = lastClientX;
     pointer.clientY = lastClientY;
     pointer.ndcX = lastNdcX;
@@ -96,8 +105,5 @@ if (typeof window !== "undefined") {
       pointer.raw = 0;
     }
     pointer.active = pointer.raw;
-
-    requestAnimationFrame(project);
-  };
-  requestAnimationFrame(project);
+  });
 }

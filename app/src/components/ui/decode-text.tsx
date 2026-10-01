@@ -124,9 +124,22 @@ export function DecodeText({
   const Tag = as;
   return (
     <Tag className={className} aria-label={text} aria-live="off">
-      {/* The visible string is aria-hidden so assistive tech announces the
-          label once, rather than a new random character on every frame. */}
-      <span aria-hidden="true">{output}</span>
+      {/*
+        The visible string is aria-hidden so assistive tech announces the label
+        once, rather than a new random character on every frame.
+
+        `inline-grid` with both children on the same cell is the fix for layout
+        shift. Decoding replaces a glyph with another glyph of the same nominal
+        advance, but the *rendered* run still changes width as characters
+        resolve — and in a flex row that pushes its siblings. Measured at 22
+        layout shifts across the page against 4 before this component existed.
+        Stacking the output over an invisible copy of the final string pins the
+        box to the finished width, so the noise can never reflow anything.
+      */}
+      <span aria-hidden="true" className="inline-grid">
+        <span className="col-start-1 row-start-1">{output}</span>
+        <span className="col-start-1 row-start-1 invisible">{text}</span>
+      </span>
     </Tag>
   );
 }

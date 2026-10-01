@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/cn";
 import { motionBlocked } from "@/lib/motion-prefs";
 
 /**
@@ -72,8 +73,16 @@ export function CountUp({ value, duration = 1100, className }: CountUpProps) {
   }, [value, duration]);
 
   return (
-    <span ref={ref} className={className}>
-      {display}
+    <span ref={ref} className={cn("inline-grid", className)}>
+      {/*
+        Same layout-shift fix as DecodeText, for the same reason and measured
+        the same way: counting from 0 to 282 changes the string's rendered width
+        three times, and in a grid row each change moves everything to its right.
+        `tabular-nums` makes each *digit* a fixed width but says nothing about
+        the string growing, so the box is pinned by overlaying the final value.
+      */}
+      <span className="col-start-1 row-start-1">{display}</span>
+      <span className="col-start-1 row-start-1 invisible">{value}</span>
     </span>
   );
 }

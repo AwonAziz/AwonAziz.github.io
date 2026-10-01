@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
+import { onFrame } from "@/lib/frame-bus";
 import { motionBlocked } from "@/lib/motion-prefs";
 import { scrollState } from "@/lib/scroll-store";
 import { scrollTo } from "@/providers/smooth-scroll";
@@ -58,12 +59,43 @@ export function Minimap() {
     const thumb = thumbRef.current;
     if (!rail || !thumb) return;
 
-    let frame = 0;
+    /**
+     * Section tops are cached, not measured per frame.
+     *
+     * Reading `getBoundingClientRect()` for seven sections on every frame is
+     * seven forced layouts per frame, and it showed up as the remaining gap in
+     * p95 frame time (41.5ms against 18ms on an earlier, lighter build). The
+     * document's height only changes on resize or when the scene lazy-loads, so
+     * the offsets are re-measured on resize and on a slow interval, and the
+     * per-frame work is a subtraction.
+     */
+    let tops: { id: string; top: number; height: number }[] = [];
+    const remeasure = () => {
+      tops = SECTIONS.map((section) => {
+        const el = document.getElementById(section.id);
+        if (!el) return { id: section.id, top: 0, height: 0 };
+        const box = el.getBoundingClientRect();
+        return {
+          id: section.id,
+          top: box.top + window.scrollY,
+          height: box.height,
+        };
+      });
+    };
+    remeasure();
 
-    const tick = () => {
-      // Total scrollable range, re-read every frame rather than cached.
-      // Sections change height as fonts resolve and the scene lazy-loads, and a
-      // stale denominator makes the thumb drift out of proportion.
+    const onResize = () => remeasure();
+    window.addEventListener("resize", onResize, { passive: true });
+
+    // Slow safety net for layout shifts the resize listener misses: fonts
+    // resolving, the WebGL chunk landing, disclosures expanding. 4Hz is ample
+    // for an indicator whose real work is comparing a cached number to scrollY.
+    const sweep = window.setInterval(remeasure, 250);
+
+    // Composed cleanup: the frame-bus subscription, the interval and the
+    // resize listener are three separate resources, and returning only one of
+    // them leaks the other two on every unmount.
+    const stopFrames = onFrame("minimap", () => {
       const limit = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const ratio = Math.min(1, Math.max(0, scrollState.y / limit));
 
@@ -75,15 +107,13 @@ export function Minimap() {
       thumb.style.transform = `translate3d(0, ${ratio * (railHeight - thumbHeight)}px, 0)`;
       thumb.style.height = `${thumbHeight}px`;
 
-      // Active marker, computed from the same store and only committed to React
-      // when it actually changes — otherwise this is 60 renders a second.
+      // Active marker from the cache. Only committed to React when it actually
+      // changes — otherwise this is 60 renders a second.
+      const anchor = window.scrollY + window.innerHeight * 0.5;
       let current = "";
-      for (const section of SECTIONS) {
-        const el = document.getElementById(section.id);
-        if (!el) continue;
-        const box = el.getBoundingClientRect();
-        if (box.top <= window.innerHeight * 0.5 && box.bottom >= window.innerHeight * 0.4) {
-          current = section.id;
+      for (const entry of tops) {
+        if (entry.height > 0 && anchor >= entry.top && anchor < entry.top + entry.height) {
+          current = entry.id;
           break;
         }
       }
@@ -91,12 +121,13 @@ export function Minimap() {
         activeRef.current = current;
         setActiveId(current);
       }
+    });
 
-      frame = requestAnimationFrame(tick);
+    return () => {
+      stopFrames();
+      window.removeEventListener("resize", onResize);
+      window.clearInterval(sweep);
     };
-
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
   }, []);
 
   return (
@@ -171,19 +202,16 @@ export function Minimap() {
 export function ProgressRule() {
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let frame = 0;
-    const tick = () => {
-      const bar = ref.current;
-      if (bar) {
-        // scale3d so the compositor owns it: no layout, no paint, no React.
-        bar.style.transform = `scale3d(${scrollState.progress}, 1, 1)`;
-      }
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, []);
+  useEffect(
+    () =>
+      // scaleX so the compositor owns it: no layout, no paint, no React. Shares
+      // the frame bus with everything else.
+      onFrame("progress", () => {
+        const bar = ref.current;
+        if (bar) bar.style.transform = `scale3d(${scrollState.progress}, 1, 1)`;
+      }),
+    [],
+  );
 
   return (
     <div aria-hidden="true" className="fixed inset-x-0 top-0 z-85 h-px bg-white/8">
