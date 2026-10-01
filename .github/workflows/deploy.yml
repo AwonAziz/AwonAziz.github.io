@@ -81,8 +81,18 @@ jobs:
           rm -rf "$root/assets"
           cp -r app/dist/assets "$root/assets"
           cp app/dist/index.html "$root/index.html"
+
+          # Each of these is optional, and this must be written as an `if`
+          # rather than as `[ -e x ] && cp ...`. Under `set -e` a failing test
+          # makes the whole `&&` chain return non-zero and aborts the step — so
+          # the one-line idiom silently fails the job the first time any file is
+          # absent, which is exactly what happened on the first run.
           for file in .nojekyll favicon.svg robots.txt sitemap.xml _headers _redirects; do
-            [ -e "app/dist/$file" ] && cp "app/dist/$file" "$root/$file"
+            if [ -e "app/dist/$file" ]; then
+              cp "app/dist/$file" "$root/$file"
+            else
+              echo "skipping $file (not in build output)"
+            fi
           done
 
           cd "$root"
