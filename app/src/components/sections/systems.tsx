@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { type System, site } from "@/config/site.data";
 import { cn } from "@/lib/cn";
+import { SectionEyebrow, useSectionNumber } from "../section";
 import { Reveal } from "../ui/reveal";
 
 /**
@@ -33,9 +34,9 @@ export function Systems() {
       <div className="shell relative section-pad">
         <header className="mb-[clamp(3rem,6vw,5rem)] grid items-end gap-x-16 gap-y-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <div>
-            <p className="eyebrow mb-5">
+            <SectionEyebrow sequence={useSectionNumber("systems")}>
               {site.systems.length === 1 ? "One system" : `${site.systems.length} systems`}
-            </p>
+            </SectionEyebrow>
             <Reveal as="h2" className="title max-w-[22ch]" from="mask">
               Each one was built to answer something the last one could not.
             </Reveal>

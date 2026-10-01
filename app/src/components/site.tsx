@@ -1,13 +1,15 @@
 import { site } from "@/config/site.data";
 import { Nav } from "./nav";
 import { Archive, Currently, Education } from "./sections/archive";
+import { CapabilityIndex } from "./sections/capability-index";
 import { Contact, Footer } from "./sections/contact";
 import { Faq } from "./sections/faq";
 import { Hero } from "./sections/hero";
 import { Method } from "./sections/method";
 import { Runtime } from "./sections/runtime";
 import { Systems } from "./sections/systems";
-import { Grain, PageRails } from "./ui/chrome";
+import { Grain, PageRails, Scanlines } from "./ui/chrome";
+import { CountUp } from "./ui/count-up";
 import { Minimap, ProgressRule } from "./ui/minimap";
 
 /**
@@ -53,6 +55,7 @@ export function Site() {
       <ProgressRule />
       <PageRails />
       <Grain />
+      <Scanlines />
       <Nav />
       <Minimap />
 
@@ -61,6 +64,7 @@ export function Site() {
         <StatsBand />
         <Systems />
         <Runtime />
+        <CapabilityIndex />
         <Method />
         <Archive />
         <Currently />
@@ -105,7 +109,7 @@ function StatsBand() {
               style={{ animationDelay: `${index * 60}ms` }}
             >
               <dd className="value-mono text-[clamp(1.75rem,1rem+2.6vw,2.75rem)] leading-none">
-                {stat.value}
+                <CountUp value={stat.value} />
               </dd>
               <dt className="label-mono mt-3 leading-relaxed">{stat.label}</dt>
             </div>

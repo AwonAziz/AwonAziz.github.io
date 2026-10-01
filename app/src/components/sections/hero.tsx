@@ -4,6 +4,7 @@ import { site } from "@/config/site.data";
 import { cn } from "@/lib/cn";
 import { motionBlocked } from "@/lib/motion-prefs";
 import { gsap, SplitText } from "@/providers/smooth-scroll";
+import { DecodeText } from "../ui/decode-text";
 import { Reveal } from "../ui/reveal";
 
 /**
@@ -36,17 +37,22 @@ export function Hero() {
   // Fires immediately on mount. The previous version gated this behind the
   // preloader clearing; with no preloader, the headline is the first thing on
   // the page and it animates in on the first frame, which is the whole point.
+  //
+  // Split is **words**, not lines or characters. A 45-character claim decoded or
+  // revealed per character is slow enough that a reader waits for it; per word
+  // it reads as a sentence arriving. Per character is reserved for the short
+  // mono lines below, where it is genuinely the right instrument.
   useGSAP(
     () => {
       const el = headlineRef.current;
       if (!el || motionBlocked) return;
 
-      const split = SplitText.create(el, { type: "lines", mask: "lines", autoSplit: true });
+      const split = SplitText.create(el, { type: "words", mask: "words", autoSplit: true });
 
-      gsap.from(split.lines, {
-        yPercent: 112,
-        duration: 0.9,
-        stagger: 0.07,
+      gsap.from(split.words, {
+        yPercent: 118,
+        duration: 0.85,
+        stagger: 0.045,
         ease: "power3.out",
       });
 
@@ -114,6 +120,9 @@ export function Hero() {
       ref={rootRef}
       id="top"
       data-scroll-section="top"
+      // Opts out of the sequence numbering: the hero is the top of the document,
+      // so calling it "section 01" is a lie about where it is.
+      data-scroll-index="off"
       className="relative flex min-h-[92svh] flex-col justify-end pb-[clamp(2.5rem,6vw,4.5rem)] pt-32"
     >
       {/* Legibility scrim. The rain is additive light running behind the
@@ -129,10 +138,12 @@ export function Hero() {
         >
           <span className="inline-flex items-center gap-2.5 text-ink-muted">
             <span aria-hidden="true" className="status-dot status-ok animate-pulse-dot" />
-            {site.headline.availability}
+            <DecodeText text={site.headline.availability} speed={22} delay={520} />
           </span>
           <span aria-hidden="true" className="hidden h-px w-8 bg-white/15 sm:block" />
-          <span className="text-ink-faint">{site.meta.location}</span>
+          <span className="text-ink-faint">
+            <DecodeText text={site.meta.location} speed={22} delay={880} />
+          </span>
         </p>
 
         <h1
@@ -189,6 +200,9 @@ export function Hero() {
           className="mt-10 flex items-center gap-2 font-mono text-micro tracking-widest text-ink-faint"
         >
           <span className="text-accent">$</span>
+          {/* Per-character reveal, not a scramble: glyphs resolving left to
+              right is what reads as typing. A scramble stands in for content
+              the author did not have. */}
           <span className="min-w-[16rem]">{role}</span>
           <span className="animate-caret">_</span>
         </p>

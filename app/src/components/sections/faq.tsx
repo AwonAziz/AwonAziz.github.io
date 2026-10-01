@@ -1,4 +1,5 @@
 import { site } from "@/config/site.data";
+import { SectionEyebrow, useSectionNumber } from "../section";
 import { Reveal } from "../ui/reveal";
 
 /**
@@ -32,7 +33,7 @@ export function Faq() {
       <div className="shell relative section-pad">
         <header className="mb-[clamp(3rem,6vw,5rem)] grid items-end gap-x-16 gap-y-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
           <div>
-            <p className="eyebrow mb-5">Before you write</p>
+            <SectionEyebrow sequence={useSectionNumber("faq")}>Before you write</SectionEyebrow>
             <Reveal from="lift" className="lede prose-measure block">
               Answered with commands and thresholds rather than reassurance, because those are
               the only two things a technical reader can check.

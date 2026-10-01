@@ -1,6 +1,54 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
+import { DecodeText } from "./ui/decode-text";
 import { Reveal } from "./ui/reveal";
+
+/**
+ * Derives the section sequence number from document order.
+ *
+ * Read from the DOM rather than hard-coded per caller, so a section can be
+ * added, removed or reordered and the numbering stays correct — which is exactly
+ * the class of bug that makes a hardcoded "04" read as stale.
+ *
+ * Every top-level section carries `data-scroll-section`. Sections that should
+ * not be numbered (the hero, contact) opt out with
+ * `data-scroll-index="off"`. The selector excludes those explicitly rather than
+ * maintaining a separate allow-list, because a list of ids is a second thing to
+ * forget to update.
+ */
+export function useSectionNumber(id: string): string {
+  const [computed, setComputed] = useState("");
+
+  useEffect(() => {
+    const sections = Array.from(
+      document.querySelectorAll('[data-scroll-section]:not([data-scroll-index="off"])'),
+    );
+    const position = sections.findIndex((el) => el.getAttribute("data-scroll-section") === id);
+    setComputed(position >= 0 ? String(position + 1).padStart(2, "0") : "");
+  }, [id]);
+
+  return computed;
+}
+
+/** The eyebrow row: sequence number, rule, then a decoding label. */
+export function SectionEyebrow({ sequence, children }: { sequence: string; children: string }) {
+  return (
+    <p className="eyebrow mb-5 flex items-baseline gap-4">
+      {/* The number is ornament and the label is content, so the sequence is
+          hidden from assistive tech — announcing "section four" before every
+          heading is noise. */}
+      {sequence ? (
+        <>
+          <span aria-hidden="true" className="text-accent">
+            {sequence}
+          </span>
+          <span aria-hidden="true" className="h-px w-8 translate-y-[-0.25em] bg-white/15" />
+        </>
+      ) : null}
+      <DecodeText text={children} speed={26} delay={120} />
+    </p>
+  );
+}
 
 export interface SectionProps {
   id: string;
@@ -61,6 +109,8 @@ export function Section({
   split = "wide-left",
   scrim = true,
 }: SectionProps) {
+  const sequence = useSectionNumber(id);
+
   return (
     <section
       id={id}
@@ -82,7 +132,7 @@ export function Section({
             )}
           >
             <div className={split === "meta-left" ? "lg:col-start-2" : undefined}>
-              {eyebrow ? <p className="eyebrow mb-5">{eyebrow}</p> : null}
+              {eyebrow ? <SectionEyebrow sequence={sequence}>{eyebrow}</SectionEyebrow> : null}
               {title ? (
                 <Reveal as="h2" className="title max-w-[20ch]" from="mask" start="top 90%">
                   {title}

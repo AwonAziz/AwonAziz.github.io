@@ -8,6 +8,7 @@ import {
   usePageTelemetry,
 } from "@/hooks/use-telemetry";
 import { cn } from "@/lib/cn";
+import { SectionEyebrow, useSectionNumber } from "../section";
 import { Reveal } from "../ui/reveal";
 
 /**
@@ -47,7 +48,9 @@ export function Runtime() {
             ratio flips from the Systems section, which is the entire trick. */}
         <header className="mb-[clamp(3rem,6vw,5rem)] grid items-end gap-x-16 gap-y-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
           <div>
-            <p className="eyebrow mb-5">Instrumentation</p>
+            <SectionEyebrow sequence={useSectionNumber("runtime")}>
+              Instrumentation
+            </SectionEyebrow>
             <Reveal from="lift" className="lede prose-measure block">
               <span className="block">
                 Most portfolios ask you to take their word for it. This one reports on itself.

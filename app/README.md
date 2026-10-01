@@ -36,14 +36,15 @@ pass/fail filter and a routing tool, not a persuasion document.
 | 2 | **Stats** | Four checkable counts immediately under the fold. A reviewer scans for numbers first, and making them scroll past an introduction is what makes portfolios feel like marketing. |
 | 3 | **Systems** | Projects inside the first two sections, not after a bio. Each leads with the hard constraint and only then names a technology. |
 | 4 | **Runtime** | The site reports on itself. Answers "did you build this, or write about it". |
-| 5 | **Method** | Working claims each paired with something openable, plus the no-go log. |
-| 6 | **Archive** | 95 lab exercises, subordinate by construction. |
-| 7 | **Currently** | Dated, labelled intent. The one place unfinished work is allowed. |
-| 8 | **Education** | Qualifications. Never presented as employment. |
-| 9 | **FAQ** | The four questions a technical reader arrives with. |
-| 10 | **Contact** | Boring, obvious, non-negotiable. |
+| 5 | **Provenance** | Every tool traced to the system that uses it. The anti-stack-wall. |
+| 6 | **Method** | Working claims each paired with something openable, plus the no-go log. |
+| 7 | **Archive** | 95 lab exercises, subordinate by construction. |
+| 8 | **Currently** | Dated, labelled intent. The one place unfinished work is allowed. |
+| 9 | **Education** | Qualifications. Never presented as employment. |
+| 10 | **FAQ** | The four questions a technical reader arrives with. |
+| 11 | **Contact** | Boring, obvious, non-negotiable. |
 
-Four things the page deliberately does **not** do, because they are the most
+Five things the page deliberately does **not** do, because they are the most
 common credibility mistakes in developer portfolios:
 
 - **No preloader.** The previous version gated the first paint behind a measured
@@ -56,8 +57,32 @@ common credibility mistakes in developer portfolios:
 - **No skill percentages or proficiency bars.** "Python 80%" is compared to
   nothing and reads as an admission of not knowing how to communicate.
 - **No stack wall.** A list claiming everything equally is senior in nothing. The
-  toolchain appears per-project and in the ticker, never as its own claim.
+  **Provenance** section is the deliberate replacement: every tool is extracted
+  from the systems above it and shows how many of them use it, so Python
+  appearing five times and Kubernetes once is a fact about the work rather than
+  a ranking.
 - **No testimonials.** No clients, no managers, nothing to show.
+- **No uniform fade-up.** Every element rising by the same distance on the same
+  stagger is the default ScrollReveal heritage and reads as a template. Each
+  effect here goes where it is the best tool: word-level masks on display type,
+  character decode on short mono labels, count-up on figures, and native
+  scroll-driven animation where no shared clock is needed.
+
+## Motion
+
+One ambient loop (the rain), and everything else earns its place.
+
+| Effect | Where | Why there |
+|--------|-------|-----------|
+| Word-level mask reveal | Hero claim, section titles | A 45-character heading revealed per character is slow enough that a reader waits for it. Per word it reads as a sentence arriving. |
+| Character decode | Hero availability line, section eyebrows | Short, technical strings, already set in a face where noise reads as plausible. Written from scratch in `components/ui/decode-text.tsx` so it uses the site's single clock and honours `prefers-reduced-motion`. |
+| Count-up | Stats band | With `tabular-nums`, so the row does not shift sideways while it counts. Counts once — re-running on every scroll entry makes the page feel like a cutscene. |
+| Native scroll-driven | Stats band | Four elements fading on entry need no shared clock and no main-thread work. |
+| Static scanlines | Whole page | Completes the terminal surface. Static, because a drifting scanline would be a second ambient loop competing with the rain. |
+
+Section numbers are **derived from DOM order**, not hard-coded, so adding,
+removing or reordering a section keeps them correct. The hero and contact opt out
+with `data-scroll-index="off"`.
 
 ## Type
 
@@ -397,4 +422,25 @@ If a claim stops being checkable, delete the claim rather than soften it.
 1. Create `src/components/sections/<name>.tsx` and add `data-scroll-section="<name>"` to the wrapper — that is how the nav and the minimap pick it up.
 2. Register it in `src/components/site.tsx`.
 3. Give it a `split` value that differs from its neighbours, or the push-and-pop rhythm breaks.
-4. Add it to the `SECTIONS` list in `src/components/ui/minimap.tsx`.
+4. Add it to the `SECTIONS` list in `src/components/ui/minimap.tsx`, and to `site.nav` if it belongs in the header.
+
+## A note on borrowing
+
+`DavidHDev/react-bits` (48k stars) and `magicuidesign/portfolio` were both
+studied as references. react-bits has **no LICENSE file** — GitHub reports
+`NOASSERTION` — so none of its code is reused here. The techniques it
+demonstrates (decode reveals, count-up, scanline treatments) are reimplemented
+from scratch in `components/ui/`, integrated with this site's single GSAP
+clock, `prefers-reduced-motion` handling and quality tiers, which the
+off-the-shelf versions do not respect.
+
+Two bugs found only by rendering and looking, not by testing:
+
+- Section numbering initially counted only `Section`-based sections, so the
+  hand-rolled ones were unnumbered and the rest started at 01 out of order. It
+  is now derived from `[data-scroll-section]` with an explicit opt-out.
+- The provenance column in the index originally rendered full system *titles* —
+  full sentences like "Model lifecycle: drift, retrain, and a promotion that can
+  be refused" — which pushed the tool's own name out of every row in the
+  three-column grid. It uses the slug now, with the titles in the accessible
+  name.

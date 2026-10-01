@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { motionBlocked } from "@/lib/motion-prefs";
 import { getQuality } from "@/lib/quality";
 
 /**
@@ -52,6 +53,44 @@ export function Grain() {
         <rect width="100%" height="100%" filter="url(#grain-filter)" />
       </svg>
     </div>
+  );
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ *  Scanlines
+ * ---------------------------------------------------------------------------
+ *  A repeating horizontal line texture, fixed over the whole document.
+ *
+ *  This is the layer that finishes the reference rather than decorating it.
+ *  The Matrix rain supplies the moving content, the depth field supplies depth,
+ *  and this supplies the *surface* the whole thing is being displayed on — which
+ *  is what makes it read as a terminal rather than as green text.
+ *
+ *  Three deliberate restraints, because this is the easiest thing on the page
+ *  to overdo:
+ *
+ *  - **Static.** A drifting scanline is a second ambient loop competing with
+ *    the rain, and the rule on this site is one ambient loop. Static texture
+ *    still reads as CRT without adding motion.
+ *  - **2% opacity.** Any stronger and it greys out the dark surfaces.
+ *  - **Disabled under reduced motion** along with the rain, since a full-screen
+ *    repeating pattern is exactly the kind of thing that triggers vestibular
+ *    symptoms.
+ * ---------------------------------------------------------------------------
+ */
+export function Scanlines() {
+  if (motionBlocked) return null;
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-1 opacity-[0.022] [contain:strict]"
+      style={{
+        backgroundImage:
+          "repeating-linear-gradient(to bottom, currentColor 0px, currentColor 1px, transparent 1px, transparent 3px)",
+      }}
+    />
   );
 }
 

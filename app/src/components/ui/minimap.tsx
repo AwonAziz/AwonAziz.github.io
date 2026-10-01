@@ -39,6 +39,7 @@ import { scrollTo } from "@/providers/smooth-scroll";
 const SECTIONS = [
   { id: "systems", label: "Systems" },
   { id: "runtime", label: "Runtime" },
+  { id: "capability", label: "Stack" },
   { id: "method", label: "Method" },
   { id: "archive", label: "Archive" },
   { id: "education", label: "Education" },

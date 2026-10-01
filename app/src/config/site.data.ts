@@ -61,6 +61,7 @@ export const site = validateSite({
   nav: [
     { label: "Systems", href: "#systems" },
     { label: "Runtime", href: "#runtime" },
+    { label: "Stack", href: "#capability" },
     { label: "Method", href: "#method" },
     { label: "FAQ", href: "#faq" },
     { label: "Contact", href: "#contact" },
