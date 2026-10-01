@@ -1,28 +1,25 @@
 # ---------------------------------------------------------------------------
-#  Build check
+#  Build and deploy
 # ---------------------------------------------------------------------------
-#  This runs the full quality gate on every push and pull request:
-#  lint -> typecheck -> build. A failing type error is caught here rather than
-#  on the live site, which is the entire value of this workflow.
+#  1. `app/` is built behind a quality gate — lint, then typecheck, then the
+#     actual build. A failing type error never reaches the deploy step.
 #
-#  It deliberately does NOT publish.
+#  2. The built site is deployed to GitHub Pages via the standard
+#     `actions/deploy-pages` artifact flow.
 #
-#  Publishing is a manual step (`./publish.ps1` on Windows, `./publish.sh` on
-#  anything else) because GitHub Pages on this repo is configured as
-#  "Deploy from a branch" (main/root) with Jekyll, which cannot be changed
-#  without repo admin access. An automated job that commits back to `main` needs
-#  write scope to a branch that Pages may well have protected, and when that
-#  push is rejected the only symptom is a red check that says nothing useful.
+#  On (2): this repo's Pages was set to "Deploy from a branch" (main/root) with
+#  Jekyll, which meant the deployed site was whatever sat at the repository root
+#  and publishing required committing build output back to `main`. That legacy
+#  deployer stopped triggering after 2026-10-01 08:56 — an empty commit did not
+#  bring it back, and the new build sat in the repo un-served. The setting is
+#  repository administration and cannot be changed from a push.
 #
-#  Two commits confirmed this: the job built and gated successfully, then failed
-#  on `git push origin HEAD:main`, with the log endpoint returning 403 so the
-#  reason could not be read.
-#
-#  If you switch Settings -> Pages -> Source to "GitHub Actions", this can be
-#  replaced with the actions/deploy-pages artifact flow, which needs no write
-#  permission to `main` at all. That is the better setup and it is one click.
+#  Switch Settings -> Pages -> Source -> **GitHub Actions** and this workflow
+#  becomes the deployer. That removes the committed root output entirely, so
+#  `assets/` and the root `index.html` can be deleted from the repository and
+#  `./publish.ps1` becomes unnecessary.
 # ---------------------------------------------------------------------------
-name: Build check
+name: Build and deploy
 
 on:
   push:
@@ -33,11 +30,13 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
-# Cancel superseded runs on the same ref. Unlike a deploy, a stale build check
-# has no value once a newer commit exists.
+# Superseded runs are cancelled. A stale build check has no value, and two
+# concurrent deployments race for the same Pages slot.
 concurrency:
-  group: build-${{ github.ref }}
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -72,3 +71,24 @@ jobs:
           # app mounts. That is not hypothetical - it is what the first deploy
           # did.
           VITE_SITE_URL: ${{ vars.VITE_SITE_URL || 'https://awonaziz.github.io' }}
+
+      # Only the default branch, and only on a real push. Pull requests still
+      # get the full quality gate above.
+      - uses: actions/configure-pages@v5
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        with:
+          path: app/dist
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
