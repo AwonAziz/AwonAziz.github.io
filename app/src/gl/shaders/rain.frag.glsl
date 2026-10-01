@@ -87,7 +87,11 @@ void main() {
   // Exponent below 1 lifts the mid-tones, which is what makes a short trail read
   // as a continuous stream. A linear falloff puts almost all the light in the
   // head cell and the rest of the column disappears.
-  float amount = pow(clamp(brightness, 0.0, 1.0), 0.55);
+  //
+  // Set to 0.55 while this was being judged for restraint, which made the whole
+  // effect read as faint texture rather than as rain. 0.42 keeps the trail
+  // continuous while restoring a real gradient from head to tail.
+  float amount = pow(clamp(brightness, 0.0, 1.0), 0.42);
   amount = mix(amount, min(amount + 0.9, 1.0), isHead * uHeadBoost);
 
   vec3 color = mix(uColorTail, uColorHead, isHead * uHeadBoost + amount * 0.3);

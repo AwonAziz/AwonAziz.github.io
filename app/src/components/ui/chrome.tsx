@@ -68,12 +68,15 @@ export function Grain() {
  *  is what makes it read as a terminal rather than as green text.
  *
  *  Three deliberate restraints, because this is the easiest thing on the page
- *  to overdo:
+ *  to overdo — and the version before this shipped at 2.2% opacity, which was
+ *  measured and found to be invisible. Restraint that cannot be seen is not
+ *  restraint, it is a no-op, so this sits at 7%: low enough not to grey out the
+ *  dark surfaces, high enough to read as a phosphor tube rather than as a flat
+ *  fill.
  *
  *  - **Static.** A drifting scanline is a second ambient loop competing with
  *    the rain, and the rule on this site is one ambient loop. Static texture
  *    still reads as CRT without adding motion.
- *  - **2% opacity.** Any stronger and it greys out the dark surfaces.
  *  - **Disabled under reduced motion** along with the rain, since a full-screen
  *    repeating pattern is exactly the kind of thing that triggers vestibular
  *    symptoms.
@@ -85,12 +88,31 @@ export function Scanlines() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-1 opacity-[0.022] [contain:strict]"
+      className="pointer-events-none fixed inset-0 z-1 opacity-[0.07] [contain:strict]"
       style={{
         backgroundImage:
           "repeating-linear-gradient(to bottom, currentColor 0px, currentColor 1px, transparent 1px, transparent 3px)",
       }}
     />
+  );
+}
+
+/**
+ * Corner-bracket frame for a focused region.
+ *
+ * The targeting-overlay motif the reticle cursor established, applied to the
+ * page furniture rather than the pointer. Four L-shaped corners and nothing in
+ * the middle, so it marks an area without putting anything on top of it.
+ */
+export function CornerFrame({ className }: { className?: string }) {
+  const corner = "absolute h-5 w-5 border-accent/25";
+  return (
+    <div aria-hidden="true" className={cn("pointer-events-none", className)}>
+      <span className={cn(corner, "top-0 left-0 border-t border-l")} />
+      <span className={cn(corner, "top-0 right-0 border-t border-r")} />
+      <span className={cn(corner, "bottom-0 left-0 border-b border-l")} />
+      <span className={cn(corner, "right-0 bottom-0 border-r border-b")} />
+    </div>
   );
 }
 

@@ -3,6 +3,7 @@ import { site } from "@/config/site.data";
 import { cn } from "@/lib/cn";
 import { SectionEyebrow, useSectionNumber } from "../section";
 import { Reveal } from "../ui/reveal";
+import { Spotlight } from "../ui/spotlight";
 
 /**
  * ---------------------------------------------------------------------------
@@ -108,39 +109,40 @@ export function CapabilityIndex() {
             const isDimmed = active !== null && !isActive;
             return (
               <li key={row.name}>
-                <a
-                  href={`#${row.systems[0]}`}
-                  onMouseEnter={() => setActive(row.name)}
-                  onFocus={() => setActive(row.name)}
-                  onMouseLeave={() => setActive(null)}
-                  onBlur={() => setActive(null)}
-                  // The full system titles. Visible on hover as a native
-                  // tooltip and, more importantly, the accessible name — the
-                  // visible slug is an abbreviation.
-                  title={titleFor(row.systems)}
-                  className={cn(
-                    "group flex h-full items-center justify-between gap-3 bg-canvas-raised px-5 py-4 transition-all duration-500",
-                    isActive && "bg-ink/[0.06]",
-                    isDimmed && "opacity-40",
-                  )}
-                >
-                  <span className="flex min-w-0 items-baseline gap-3">
-                    {/* The count is a monospace figure, so it aligns into a
-                        column and the grid reads as an index rather than a
-                        list. */}
-                    <span className="value-mono w-3 shrink-0 text-right text-accent/70">
-                      {row.systems.length}
+                <Spotlight className="h-full">
+                  <a
+                    href={`#${row.systems[0]}`}
+                    onMouseEnter={() => setActive(row.name)}
+                    onFocus={() => setActive(row.name)}
+                    onMouseLeave={() => setActive(null)}
+                    onBlur={() => setActive(null)}
+                    // The full system titles. Visible on hover as a native
+                    // tooltip and, more importantly, the accessible name — the
+                    // visible slug is an abbreviation.
+                    title={titleFor(row.systems)}
+                    className={cn(
+                      "flex h-full items-center justify-between gap-3 bg-canvas-raised px-5 py-4 transition-colors duration-500 hover:bg-canvas-raised/60",
+                      isDimmed && "opacity-40",
+                    )}
+                  >
+                    <span className="flex min-w-0 items-baseline gap-3">
+                      {/* The count is a monospace figure, so it aligns into a
+                          column and the grid reads as an index rather than a
+                          list. */}
+                      <span className="value-mono w-3 shrink-0 text-right text-accent/70">
+                        {row.systems.length}
+                      </span>
+                      <span className="truncate font-mono text-small text-ink">{row.name}</span>
                     </span>
-                    <span className="truncate font-mono text-small text-ink">{row.name}</span>
-                  </span>
 
-                  {/* Short slug, always visible, rising to the accent on
-                      hover. `min-w-0` on the parent is what lets this
-                      truncate instead of pushing the tool name out. */}
-                  <span className="hidden min-w-0 shrink truncate font-mono text-micro tracking-wider text-ink-faint transition-colors duration-500 group-hover:text-accent sm:block">
-                    {usedBy(row.systems)}
-                  </span>
-                </a>
+                    {/* Short slug, always visible, rising to the accent on
+                        hover. `min-w-0` on the parent is what lets this
+                        truncate instead of pushing the tool name out. */}
+                    <span className="hidden min-w-0 shrink truncate font-mono text-micro tracking-wider text-ink-faint transition-colors duration-500 group-hover/spot:text-accent sm:block">
+                      {usedBy(row.systems)}
+                    </span>
+                  </a>
+                </Spotlight>
               </li>
             );
           })}

@@ -11,6 +11,7 @@ import { Systems } from "./sections/systems";
 import { Grain, PageRails, Scanlines } from "./ui/chrome";
 import { CountUp } from "./ui/count-up";
 import { Minimap, ProgressRule } from "./ui/minimap";
+import { ReticleCursor } from "./ui/reticle-cursor";
 
 /**
  * ---------------------------------------------------------------------------
@@ -57,6 +58,7 @@ export function Site() {
       <Grain />
       <Scanlines />
       <Nav />
+      <ReticleCursor />
       <Minimap />
 
       <main id="main">

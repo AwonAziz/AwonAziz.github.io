@@ -91,14 +91,15 @@ export function MatrixRain({
       uGrid: { value: new Vector2(80, 40) },
       uAtlasGrid: { value: new Vector2(ATLAS_LAYOUT.columns, ATLAS_LAYOUT.rows) },
       uGlyphCount: { value: atlas?.count ?? 0 },
-      // Long-ish trails. A short trail reads as a scatter of characters with a
+      // Long trails. A short trail reads as a scatter of characters with a
       // brighter one somewhere; the trail is what makes it rain.
-      uFallSpeed: { value: 0.46 },
-      uTrailLength: { value: 11 },
-      // ~1 glyph change every two seconds per cell, unsynchronised.
-      uCycleRate: { value: 0.45 },
+      uFallSpeed: { value: 0.42 },
+      uTrailLength: { value: 14 },
+      // ~1 glyph change every three seconds per cell, unsynchronised. Faster
+      // cycling reads as static rather than as falling text.
+      uCycleRate: { value: 0.34 },
       uOpacity: { value: quality.rainOpacity },
-      uHeadBoost: { value: 0.8 },
+      uHeadBoost: { value: 1 },
       uDither: { value: 0.045 },
       uFrozen: { value: 0 },
       uScroll: { value: 0 },
@@ -106,8 +107,8 @@ export function MatrixRain({
       // Head near-white, trail a saturated phosphor. The head being the only
       // near-white cell is what makes the effect read as light through a medium
       // rather than as green noise.
-      uColorHead: { value: new Color("#eaffe4") },
-      uColorTail: { value: new Color("#17d97c") },
+      uColorHead: { value: new Color("#f2fff8") },
+      uColorTail: { value: new Color("#1aff8c") },
       uAtlas: { value: atlas?.texture },
     }),
     [atlas, quality.rainOpacity],

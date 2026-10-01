@@ -364,29 +364,36 @@
    =========================================================================== */
 
 @utility scrim-left {
+  /* Recalibrated when the rain went from 0.17 to 0.46 opacity. Tripling the
+     effect without re-tuning this is what put glyphs across the body copy —
+     the scrim was sized for a faint field. The stops are now held near-solid
+     across the whole text column (which runs to roughly 62% of the shell) and
+     released quickly after, so the right third is unobstructed and dramatic
+     while the prose stays clean. */
   background-image: linear-gradient(
     100deg,
     var(--color-canvas) 0%,
-    color-mix(in oklch, var(--color-canvas) 90%, transparent) 24%,
-    color-mix(in oklch, var(--color-canvas) 64%, transparent) 44%,
-    color-mix(in oklch, var(--color-canvas) 26%, transparent) 64%,
-    color-mix(in oklch, var(--color-canvas) 7%, transparent) 82%,
-    transparent 100%
+    color-mix(in oklch, var(--color-canvas) 97%, transparent) 22%,
+    color-mix(in oklch, var(--color-canvas) 90%, transparent) 42%,
+    color-mix(in oklch, var(--color-canvas) 68%, transparent) 58%,
+    color-mix(in oklch, var(--color-canvas) 26%, transparent) 76%,
+    transparent 92%
   );
 }
 
 @utility scrim-block {
-  /* Tuned against the muted prose colour, not the headline.
-     `ink-muted` on the canvas already clears 4.5:1 with nothing behind it, so
-     this only needs to cover what the rain and the depth field actually add.
-     The first pass at 36% in the middle was legible but read as busy — the eye
+  /* Tuned against the muted prose colour, not the headline, and re-checked
+     after the rain opacity went up. `ink-muted` on the canvas already clears
+     4.5:1 with nothing behind it, so this only has to cover what the rain and
+     the depth field actually add — but "only" is not "barely", and the first
+     two passes were legible-but-busy rather than legible-and-clean. The eye
      parses a dense moving field as information and stops reading the prose. */
   background-image: linear-gradient(
     to bottom,
-    color-mix(in oklch, var(--color-canvas) 74%, transparent) 0%,
-    color-mix(in oklch, var(--color-canvas) 62%, transparent) 26%,
-    color-mix(in oklch, var(--color-canvas) 56%, transparent) 58%,
-    color-mix(in oklch, var(--color-canvas) 70%, transparent) 100%
+    color-mix(in oklch, var(--color-canvas) 82%, transparent) 0%,
+    color-mix(in oklch, var(--color-canvas) 74%, transparent) 26%,
+    color-mix(in oklch, var(--color-canvas) 68%, transparent) 58%,
+    color-mix(in oklch, var(--color-canvas) 78%, transparent) 100%
   );
 }
 
