@@ -1,5 +1,19 @@
 # Awon Aziz — portfolio
 
+> **Repository layout.** The repo root is the GitHub Pages deploy target —
+> `index.html`, `assets/` and friends at the root are build output and are
+> committed. The Vite project lives in **`app/`**.
+>
+> ```bash
+> cd app
+> npm install
+> npm run dev        # http://localhost:5173
+> ```
+>
+> The GitHub Actions workflow builds `app/`, checks lint and typecheck, then
+> copies the result to the root and commits it back. See
+> [Deploying](#deploying) for why that indirection exists.
+
 An AI/MLOps engineer's portfolio. One RAF loop for the whole site, a hand-written
 GLSL Matrix rain and depth field inside a single WebGL canvas, five case studies
 where every decision is printed next to what it cost, and an instrumentation
@@ -298,11 +312,13 @@ the initial HTML payload. `app.tsx` lazy-loads `Scene` behind `Suspense`.
 
 ## Commands
 
+Run from `app/`:
+
 ```bash
 npm install
 npm run dev          # http://localhost:5173
-npm run build        # typecheck + vite build -> dist/
-npm run preview      # serve dist/
+npm run build        # typecheck + vite build -> app/dist
+npm run preview      # serve app/dist
 npm run lint         # biome check
 npm run lint:fix
 npm run typecheck
@@ -310,37 +326,48 @@ npm run typecheck
 
 Requires Node `>=20.19`.
 
+To publish a change without waiting for CI:
+
+```bash
+cd app
+npm run build
+cd ..
+rm -rf assets && cp -r app/dist/assets assets
+cp app/dist/index.html app/dist/favicon.svg app/dist/robots.txt app/dist/sitemap.xml .
+git commit -am "chore: publish build" && git push
+```
+
 ## Deploying
 
-`dist/` is a fully static bundle with no server runtime. Both targets are
-configured already.
+### GitHub Pages (current setup)
 
-### GitHub Pages
+`.github/workflows/deploy.yml` runs `lint` and `typecheck` **before** building, so
+a broken push cannot ship. It then copies `app/dist` to the repository root and
+commits it back with a `[skip ci]` marker so it does not re-trigger itself.
 
-`.github/workflows/deploy.yml` builds and publishes on every push to `main`, and
-runs `lint` + `typecheck` **before** the build so a broken push never reaches
-Pages.
+The copy-back exists because Pages here is configured as **"Deploy from a
+branch"** (`main/root`) with Jekyll. That setting needs repo admin to change, and
+a Jekyll branch build serves whatever is at the root — so the root has to *be*
+the built site. The workflow also removed `_config.yml` and added `.nojekyll` so
+Pages stops Jekyll entirely.
 
-1. **Settings → Pages → Build and deployment → Source → GitHub Actions**
-2. **Settings → Secrets and variables → Actions → Variables → `VITE_SITE_URL`**
-
-`vite.config.ts` defaults `base` to `"./"`, so Vite emits *relative* asset URLs —
-the only setting that works unchanged on a user site, a project site at
-`user.github.io/repo/`, and a custom domain. Absolute `/assets/...` paths 404 on
-a sub-path, which is the most common way this deploy breaks.
+**Optional, and worth doing:** switch **Settings → Pages → Source → GitHub
+Actions**. Once that is set, delete the `Publish to repository root` step and the
+`actions/deploy-pages` artifact path can be used directly, which means the root
+no longer needs committed build output at all.
 
 ### Cloudflare Pages
 
-Build command `npm run build`, output directory `dist`, Node `22` (from
-`.nvmrc`), environment variable `VITE_SITE_URL`. By hand:
+Build command `npm run build`, output directory `app/dist`, Node `22` (from
+`app/.nvmrc`), environment variable `VITE_SITE_URL`. By hand:
 
 ```bash
-npm run build
+cd app && npm run build
 npx wrangler pages deploy dist --project-name devfolio
 ```
 
-`public/_headers` sets a strict CSP naming only the origins the page needs, plus
-HSTS, `nosniff`, `X-Frame-Options: DENY`, immutable caching on fingerprinted
+`app/public/_headers` sets a strict CSP naming only the origins the page needs,
+plus HSTS, `nosniff`, `X-Frame-Options: DENY`, immutable caching on fingerprinted
 `/assets/*`, and `max-age=0` on `index.html` so a deploy is never invisible.
 
 **Do not enable Cloudflare Web Analytics or Bot Fight Mode.** Both inject scripts
