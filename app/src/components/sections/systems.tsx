@@ -42,10 +42,10 @@ export function Systems() {
             </Reveal>
           </div>
           <Reveal from="lift" delay={0.08} className="lede prose-measure block">
-            All {site.systems.length} are public and runnable. Two use simulated data and say so
-            on the tin; one has been running unattended for six weeks. Every claim is either a
-            number from the running system or a file you can open — and every one lists what it
-            deliberately does not do.
+            All {site.systems.length} are public and runnable. Three ship generated data by
+            default and label every row with where it came from; one has been running unattended
+            since August. Every claim is either a number from the running system or a file you
+            can open — and every one lists what it deliberately does not do.
           </Reveal>
         </header>
 

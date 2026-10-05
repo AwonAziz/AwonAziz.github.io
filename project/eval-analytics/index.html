@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" class="bg-canvas text-ink antialiased">
+  <head>
+    <script>(function () {
+  try {
+    var t = localStorage.getItem('devfolio-theme');
+    var p = localStorage.getItem('devfolio-palette');
+    var root = document.documentElement;
+    if (t === 'light' || t === 'dark') root.dataset.theme = t;
+    if (p && ["phosphor","glacier","ember","magenta","violet","lime"].indexOf(p) > -1 && p !== 'phosphor') {
+      root.dataset.palette = p;
+    }
+    // Suppress every transition for one frame, then allow them. Without this the
+    // first application animates each element's own transition-* and the page
+    // appears to flash.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { root.classList.add('theme-ready'); });
+    });
+  } catch (e) {
+    document.documentElement.classList.add('theme-ready');
+  }
+})();</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <script type="module" crossorigin src="../../assets/styles-rSwq4Jsr.js"></script>
+    <script type="module" crossorigin src="../../assets/entry-standalone-DCfJ6H4B.js"></script>
+    
+    <link rel="preload" href="../../assets/space-grotesk-latin-var-BhU9QXUp.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="../../assets/geist-mono-latin-var-XN7g48iV.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" crossorigin href="../../assets/styles-DUBBTpYI.css">
+    <title>Evaluation warehouse: six questions that are hard in a notebook and trivial in SQL — Awon Aziz</title>
+    <meta name="description" content="Every project here already writes evaluation artefacts — per-prediction arrays, serving reports, drift metrics. This puts them in a DuckDB star schema behind real migrations and answers the six questions that decide whether a model change was an improvement: LoRA against a full fine-tune, calibration by arm, INT8 against FP32, drift trend, error by document length, and which slices still lose.">
+    <link rel="canonical" href="https://awonaziz.github.io/project/eval-analytics/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Evaluation warehouse: six questions that are hard in a notebook and trivial in SQL">
+    <meta property="og:description" content="Every project here already writes evaluation artefacts — per-prediction arrays, serving reports, drift metrics. This puts them in a DuckDB star schema behind real migrations and answers the six questions that decide whether a model change was an improvement: LoRA against a full fine-tune, calibration by arm, INT8 against FP32, drift trend, error by document length, and which slices still lose.">
+    <meta property="og:url" content="https://awonaziz.github.io/project/eval-analytics/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Evaluation warehouse: six questions that are hard in a notebook and trivial in SQL">
+    <meta name="twitter:description" content="Every project here already writes evaluation artefacts — per-prediction arrays, serving reports, drift metrics. This puts them in a DuckDB star schema behind real migrations and answers the six questions that decide whether a model change was an improvement: LoRA against a full fine-tune, calibration by arm, INT8 against FP32, drift trend, error by document length, and which slices still lose.">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Person","@id":"https://awonaziz.github.io/#person","name":"Awon Aziz","jobTitle":"AI / MLOps engineer","description":"AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.","url":"https://awonaziz.github.io","email":"mailto:awonaziz786@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Islamabad","addressCountry":"PK"},"knowsAbout":["Python","NumPy","PyTorch","peft","ONNX","ONNX Runtime","FastAPI","pytest","DuckDB","SQLAlchemy","Pandas","Pydantic","Streamlit","Plotly","Ollama","qwen3:8b","sentence-transformers","SQLite","Prometheus","Docker","Chroma","CrewAI","Kubernetes","scikit-learn"],"alumniOf":[{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"IMCB F-8/4, Islamabad"}],"sameAs":["https://github.com/AwonAziz","https://www.linkedin.com/in/awonaziz","https://leetcode.com/AwonAziz","mailto:awonaziz786@gmail.com"]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Evaluation warehouse: six questions that are hard in a notebook and trivial in SQL","description":"Every project here already writes evaluation artefacts — per-prediction arrays, serving reports, drift metrics. This puts them in a DuckDB star schema behind real migrations and answers the six questions that decide whether a model change was an improvement: LoRA against a full fine-tune, calibration by arm, INT8 against FP32, drift trend, error by document length, and which slices still lose.","articleSection":"Engineering case study","datePublished":"2026-01-01","inLanguage":"en","url":"https://awonaziz.github.io/project/eval-analytics/","mainEntityOfPage":{"@type":"WebPage","@id":"https://awonaziz.github.io/project/eval-analytics/"},"author":{"@id":"https://awonaziz.github.io/#person"},"about":{"@id":"https://awonaziz.github.io/#person"},"keywords":"Python, DuckDB, SQLAlchemy, Pandas, Pydantic, FastAPI, Streamlit, Plotly","wordCount":731}]</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Overview","item":"https://awonaziz.github.io/"},{"@type":"ListItem","position":2,"name":"Systems","item":"https://awonaziz.github.io/projects/"},{"@type":"ListItem","position":3,"name":"Evaluation warehouse: six questions that are hard in a notebook and trivial in SQL","item":"https://awonaziz.github.io/project/eval-analytics/"}]}</script>
+  </head>
+  <body data-project="eval-analytics">
+    <div id="root"></div>
+    <div data-static-project="eval-analytics" hidden="" aria-hidden="true"><pre style="display:none">Evaluation warehouse: six questions that are hard in a notebook and trivial in SQL
+Awon Aziz — AI / MLOps engineer. 2026. Shipped — 141 tests, 5 migrations, a quality gate that fails CI
+
+Every project here already writes evaluation artefacts — per-prediction arrays, serving reports, drift metrics. This puts them in a DuckDB star schema behind real migrations and answers the six questions that decide whether a model change was an improvement: LoRA against a full fine-tune, calibration by arm, INT8 against FP32, drift trend, error by document length, and which slices still lose.
+
+THE HARD PART
+An evaluation number is only as trustworthy as the row underneath it. A warehouse that silently mixes measured telemetry with generated fixtures will eventually publish a synthetic result as though it were real, and nobody reviewing the dashboard will know which is which. So every row carries a `data_origin` column, rejected rows are counted rather than tolerated, and editing a migration that has already been applied raises instead of letting the schema drift away from what CI built.
+
+DECISIONS, AND WHAT EACH COST
+1. Every row is labelled with where it came from, and the default build has only generated rows
+   Why: The fine-tuning artefacts belong to a separate repository, so that module fabricates files of exactly those shapes from a fixed seed and `eap build` regenerates them byte-for-byte. Measured rows appear only when the upstream telemetry database is present — 5,140 per-request predictions, of which 2,762 carry a gold label and 2,378 are unlabelled production traffic kept with a NULL label rather than discarded or guessed at. Filter any figure to data_origin = 'real' to see only measured numbers.
+   Cost: The headline figures on a fresh clone are from generated data. That is stated at the top of the README rather than in a footnote, and it is why the synthetic generator encodes specific findings instead of noise.
+2. The quality gate fails the build rather than warning in it
+   Why: Five checks, and the fifth is the one that matters most: analytical coverage. Fewer than two arms, fewer than two quantisations, a missing slice family, no drift features, too few labelled predictions — each of those makes the six analyses quietly meaningless while every individual query still returns rows. A gate that only checked for orphans would pass a warehouse that had lost the ability to answer the question.
+   Cost: Mart freshness is deliberately not a global frontier. Drift measurements legitimately extend past the evaluation date, so comparing every mart to the newest date in the warehouse would flag a complete build as stale. It is per-mart against its own staging table instead.
+3. Rejected rows are counted, with machine-readable error codes and the raw payload
+   Why: Contracts are strict about unknown keys, so a renamed upstream column fails loudly rather than passing silently. Bounds are mostly physical rather than statistical — confidence in [0,1], n_correct &lt;= n_samples, accuracy inside its own confidence interval, trainable_params &lt;= total_params. The default build must produce zero rejections and CI fails otherwise; the rejection path itself is exercised by tests against deliberately corrupted artefacts.
+   Cost: A row that would have been quietly wrong is now a failed build. That is the intent, but it means upstream schema changes surface as red rather than as a subtly different number.
+4. Surrogate keys are BLAKE2b over the natural grain, not the database's hash()
+   Why: Identical inputs then produce identical keys, which makes a diff of the warehouse a meaningful review artifact. A content-dependent hash would make every rebuild look like a total rewrite.
+   Cost: Key derivation has to be applied consistently in the transform layer, and an out-of-band insert that skips it produces orphans the gate will catch.
+5. /sql is restricted rather than trusted
+   Why: Single statement, must begin with SELECT or WITH, write and DDL keywords rejected, row cap enforced. Fifteen blocked statements are asserted in the test suite, so the guard cannot rot as the keyword list grows.
+   Cost: The read-only surface is narrower than a real analyst would want, and widening it means widening the blocklist.
+
+DELIBERATELY NOT BUILT
+- The fine-tune artefacts are generated, not measured. Real numbers replace them by dropping files into data/raw/ with no code change, but a fresh clone has only the synthetic rows.
+- INT8 quantisation is approximated by rounding pre-softmax activations onto a group-wise symmetric grid. It reproduces realistic disagreement rates; it is not a simulation of a particular kernel.
+- Bootstrap intervals resample documents, which is the right unit for a paired comparison but does not capture variance across training runs. One training run per arm is modelled.
+- Ingestion is single-writer and local. There is no scheduler, no incremental partition strategy and no warehouse anyone else writes to.
+
+STACK: Python, DuckDB, SQLAlchemy, Pandas, Pydantic, FastAPI, Streamlit, Plotly
+
+METRICS
+- Tests, hermetic by default: 141
+- Versioned SQL migrations: 5
+- Analyses behind the API: 6
+- Blocked SQL statements asserted: 15
+- Charts in the dashboard: 17
+- Quality-gate checks: 5
+
+SOURCE
+- https://github.com/AwonAziz/eval-analytics-platform
+
+Full case study: https://awonaziz.github.io/project/eval-analytics/
+Contact: awonaziz786@gmail.com</pre></div>
+  </body>
+</html>

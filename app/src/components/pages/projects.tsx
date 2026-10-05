@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { type System, site } from "@/config/site.data";
 import { cn } from "@/lib/cn";
-import { motionBlocked } from "@/lib/motion-prefs";
+import { link, projectHref, ROUTES } from "@/lib/paths";
 import { Reveal } from "../ui/reveal";
 import { Spotlight } from "../ui/spotlight";
+import { SystemMark } from "../ui/system-mark";
 
 /**
  * ---------------------------------------------------------------------------
@@ -14,8 +15,9 @@ import { Spotlight } from "../ui/spotlight";
  *  Eye-tracking research on document reading (NN/g, 130,000 fixations) is
  *  unambiguous about where attention goes: 57% of viewing time above the fold,
  *  74% within the first two screenfuls. A portfolio is a pass/fail filter, so
- *  the work has to be reachable without scrolling — and "here are five projects,
- *  each with a page" is a shorter path than five long disclosures on one page.
+ *  the work has to be reachable without scrolling — and "here are every project,
+ *  each with a page of its own" is a shorter path than seven long disclosures
+ *  on one page.
  *
  *  Each entry states the constraint and links to the deep dive, because the
  *  constraint is the part worth reading in a list and the reasoning is the part
@@ -28,10 +30,10 @@ export function ProjectsIndex() {
       <header className="mb-[clamp(2.5rem,5vw,4rem)] max-w-[46rem]">
         <p className="eyebrow mb-5 flex items-baseline gap-4">
           <span aria-hidden="true" className="text-accent">
-            05
+            {String(site.systems.length).padStart(2, "0")}
           </span>
           <span aria-hidden="true" className="h-px w-8 translate-y-[-0.25em] bg-white/15" />
-          {site.systems.length} systems
+          systems
         </p>
         {/* One step below the home hero's display scale. At the hero's size this
             runs to five lines on a 1600px viewport and eats the entire first
@@ -42,7 +44,7 @@ export function ProjectsIndex() {
           className="max-w-[24ch] text-[clamp(2rem,1rem+3.6vw,4.25rem)] leading-[1.02] font-medium tracking-[-0.03em] text-balance"
           from="mask"
         >
-          Five systems, each answering a question the last one could not.
+          Seven systems, each answering a question the last one could not.
         </Reveal>
         <Reveal from="lift" delay={0.1} className="lede prose-measure mt-7 block">
           All public and runnable. Each opens on the hard part rather than the stack, and every
@@ -62,7 +64,7 @@ export function ProjectsIndex() {
         The foundations behind these — ninety-five committed lab exercises — are indexed in the{" "}
         <a
           className="text-ink underline decoration-accent/50 underline-offset-4 hover:decoration-accent"
-          href="./index.html#archive"
+          href={link("/index.html#archive")}
         >
           archive section
         </a>
@@ -76,7 +78,7 @@ function ProjectRow({ system, index }: { system: System; index: number }) {
   return (
     <Spotlight className="h-full">
       <a
-        href={`./project.html?id=${system.slug}`}
+        href={projectHref(system.slug)}
         data-cursor-label="Open"
         className="group flex flex-col gap-5 bg-canvas-raised px-6 py-7 transition-colors duration-500 hover:bg-canvas-raised/60 md:flex-row md:items-start md:gap-10 md:px-8 md:py-9"
       >
@@ -86,6 +88,7 @@ function ProjectRow({ system, index }: { system: System; index: number }) {
 
         <span className="min-w-0 flex-1">
           <span className="label-mono mb-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <SystemMark slug={system.slug} className="text-[0.9rem] text-accent/70" />
             <span>{system.year}</span>
             <span aria-hidden="true" className="h-px w-5 bg-white/15" />
             <span className="normal-case tracking-normal text-ink-faint">{system.status}</span>
@@ -154,23 +157,27 @@ function ProjectRow({ system, index }: { system: System; index: number }) {
  *  Project detail
  * ---------------------------------------------------------------------------
  *  The deep dive an interviewer actually wants: the constraint, the decisions
- *  with their costs, the architecture, and the scope boundary. A separate URL,
- *  so it is linkable, shareable internally, and survives being pasted into a
- *  hiring thread.
+ *  with their costs, the architecture, and the scope boundary.
+ *
+ *  Each system is a separate generated document at `/project/<slug>/`, so the
+ *  page is linkable, indexable on its own, cacheable on its own, and survives
+ *  being pasted into a hiring thread. `initialSlug` comes from the URL — the
+ *  `?id=` query is still accepted so an older bookmark resolves.
  * ---------------------------------------------------------------------------
  */
-export function ProjectDetail() {
-  const [slug, setSlug] = useState<string | null>(null);
+export function ProjectDetail({ initialSlug }: { initialSlug: string | null }) {
+  const [slug, setSlug] = useState<string | null>(initialSlug);
 
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get("id");
-    setSlug(id);
-    // A slug the reader arrived with is written back without the query, so
-    // a reload is not a different page and the URL stays shareable.
-    if (id) document.title = `${findSystem(id)?.title ?? "Project"} — Awon Aziz`;
+    if (id) setSlug(id);
   }, []);
 
   const system = useMemo(() => (slug ? findSystem(slug) : undefined), [slug]);
+  const index = system ? site.systems.indexOf(system) : -1;
+  const previous = index > 0 ? site.systems[index - 1] : undefined;
+  const next =
+    index >= 0 && index < site.systems.length - 1 ? site.systems[index + 1] : undefined;
 
   if (!system) {
     return (
@@ -183,7 +190,7 @@ export function ProjectDetail() {
           The link may be from an older version of the site. The{" "}
           <a
             className="text-ink underline decoration-accent/50 underline-offset-4"
-            href="./projects/"
+            href={link(ROUTES.projects)}
           >
             systems index
           </a>{" "}
@@ -197,33 +204,78 @@ export function ProjectDetail() {
 
   return (
     <article className="pt-28">
-      <nav aria-label="Breadcrumb" className="mb-10">
-        <a
-          href="./projects.html"
-          className="label-mono inline-flex items-center gap-2 transition-colors hover:text-accent"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="size-3.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M19 12H5M11 6l-6 6 6 6" />
-          </svg>
-          All systems
-        </a>
+      {/* Sibling navigation. Seven sibling pages with no cross-link is the
+          failure mode the research names as the reason a case study gets read
+          once and never again: a reader who finishes one has to go back to an
+          index to choose the next. The current position is stated rather than
+          implied, because "03 / 07" is the whole orientation. */}
+      <nav aria-label="Systems" className="mb-10">
+        <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-2">
+          {site.systems.map((item, itemIndex) => {
+            const current = item.slug === system.slug;
+            return (
+              <li key={item.slug}>
+                <a
+                  href={projectHref(item.slug)}
+                  aria-current={current ? "page" : undefined}
+                  className={cn(
+                    "label-mono flex h-8 w-8 items-center justify-center rounded-pill border transition-all duration-300",
+                    current
+                      ? "border-accent bg-accent font-medium text-on-accent"
+                      : "border-white/12 text-ink-faint hover:border-accent/60 hover:text-accent",
+                  )}
+                >
+                  {String(itemIndex + 1).padStart(2, "0")}
+                  {/* The accessible name is the project title. Without it the
+                      switcher is seven identical two-digit numbers to anyone
+                      navigating by screen reader or by voice. */}
+                  <span className="sr-only">{item.title}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ol>
       </nav>
 
       <header className="mb-[clamp(2.5rem,5vw,4rem)]">
-        <p className="eyebrow mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
-          <span>{system.year}</span>
-          <span aria-hidden="true" className="h-px w-6 bg-white/15" />
-          <span className="normal-case tracking-normal text-ink-faint">{system.status}</span>
-        </p>
+        <div className="mb-7 flex items-center gap-5">
+          {/* The mark sits above the eyebrow rather than beside the title: at
+              this size it reads as a stamp opening the document, and beside a
+              3.5rem headline it would compete with it. */}
+          <SystemMark
+            slug={system.slug}
+            className="shrink-0 text-[2.25rem] text-accent/85 md:text-[2.75rem]"
+          />
+          <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-2">
+            <a
+              href={link(ROUTES.projects)}
+              className="label-mono inline-flex items-center gap-2 transition-colors hover:text-accent"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="size-3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M19 12H5M11 6l-6 6 6 6" />
+              </svg>
+              All systems
+            </a>
+            <span aria-hidden="true" className="h-px w-6 bg-white/15" />
+            <span>
+              {String(index + 1).padStart(2, "0")} /{" "}
+              {String(site.systems.length).padStart(2, "0")}
+            </span>
+            <span aria-hidden="true" className="h-px w-6 bg-white/15" />
+            <span>{system.year}</span>
+            <span aria-hidden="true" className="h-px w-6 bg-white/15" />
+            <span className="normal-case tracking-normal text-ink-faint">{system.status}</span>
+          </p>
+        </div>
         <Reveal
           as="h1"
           className="max-w-[26ch] text-[clamp(1.875rem,1rem+2.8vw,3.5rem)] leading-[1.05] font-medium tracking-[-0.028em] text-balance"
@@ -354,43 +406,89 @@ export function ProjectDetail() {
       </section>
 
       <section className="border-t border-white/10 pt-10">
-        <h2 className="eyebrow mb-5">Elsewhere on this site</h2>
-        <ul className="grid gap-2 sm:grid-cols-2">
+        <h2 className="eyebrow mb-5">Every other system</h2>
+        <ul className="grid gap-px overflow-hidden rounded-card border border-white/10 bg-white/10 sm:grid-cols-2">
           {siblings.map((item) => (
             <li key={item.slug}>
               <a
-                href={`./project.html?id=${item.slug}`}
-                className="group flex items-baseline gap-3 text-body text-ink-muted transition-colors hover:text-accent"
+                href={projectHref(item.slug)}
+                className="group flex h-full items-baseline gap-3 bg-canvas-raised px-5 py-4 transition-colors duration-300 hover:bg-canvas-raised/60"
               >
                 <span className="value-mono text-accent/60">
                   {String(site.systems.indexOf(item) + 1).padStart(2, "0")}
                 </span>
-                <span className="min-w-0 truncate">{item.title}</span>
+                <span className="min-w-0 flex-1 text-body text-ink-muted transition-colors group-hover:text-accent">
+                  {item.title}
+                </span>
+                <span className="label-mono shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
+                  →
+                </span>
               </a>
             </li>
           ))}
         </ul>
-        <p className={cn("mt-8", motionBlocked ? "text-small" : "text-small")}>
-          <a
-            href="./index.html"
-            className="label-mono inline-flex items-center gap-2 transition-colors hover:text-accent"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="size-3.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M19 12H5M11 6l-6 6 6 6" />
-            </svg>
-            Back to the overview
-          </a>
-        </p>
       </section>
+
+      {/* Sequential navigation. A reader who lands on one system from a search
+          result or a shared link should be able to reach the next one without
+          going back to the index, and the pair states which is which rather than
+          leaving the reader to guess from the direction of an arrow. */}
+      <nav
+        aria-label="Adjacent systems"
+        className="mt-10 grid gap-px overflow-hidden rounded-card border border-white/10 bg-white/10 sm:grid-cols-2"
+      >
+        {previous ? (
+          <a
+            href={projectHref(previous.slug)}
+            className="group flex flex-col gap-2 bg-canvas-raised px-6 py-6 transition-colors duration-300 hover:bg-canvas-raised/60"
+          >
+            <span className="label-mono flex items-center gap-2 text-ink-faint">
+              <span aria-hidden="true">←</span> Previous
+            </span>
+            <span className="text-body leading-snug text-ink transition-colors group-hover:text-accent">
+              {previous.title}
+            </span>
+          </a>
+        ) : (
+          <span className="hidden bg-canvas-raised/40 px-6 py-6 sm:block" />
+        )}
+        {next ? (
+          <a
+            href={projectHref(next.slug)}
+            className="group flex flex-col items-end gap-2 bg-canvas-raised px-6 py-6 text-right transition-colors duration-300 hover:bg-canvas-raised/60"
+          >
+            <span className="label-mono flex items-center gap-2 text-ink-faint">
+              Next <span aria-hidden="true">→</span>
+            </span>
+            <span className="text-body leading-snug text-ink transition-colors group-hover:text-accent">
+              {next.title}
+            </span>
+          </a>
+        ) : (
+          <span className="hidden bg-canvas-raised/40 px-6 py-6 sm:block" />
+        )}
+      </nav>
+
+      <p className="mt-8 text-small">
+        <a
+          href={link(ROUTES.home)}
+          className="label-mono inline-flex items-center gap-2 transition-colors hover:text-accent"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="size-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+          Back to the overview
+        </a>
+      </p>
     </article>
   );
 }

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" class="bg-canvas text-ink antialiased">
+  <head>
+    <script>(function () {
+  try {
+    var t = localStorage.getItem('devfolio-theme');
+    var p = localStorage.getItem('devfolio-palette');
+    var root = document.documentElement;
+    if (t === 'light' || t === 'dark') root.dataset.theme = t;
+    if (p && ["phosphor","glacier","ember","magenta","violet","lime"].indexOf(p) > -1 && p !== 'phosphor') {
+      root.dataset.palette = p;
+    }
+    // Suppress every transition for one frame, then allow them. Without this the
+    // first application animates each element's own transition-* and the page
+    // appears to flash.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { root.classList.add('theme-ready'); });
+    });
+  } catch (e) {
+    document.documentElement.classList.add('theme-ready');
+  }
+})();</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <script type="module" crossorigin src="../../assets/styles-rSwq4Jsr.js"></script>
+    <script type="module" crossorigin src="../../assets/entry-standalone-DCfJ6H4B.js"></script>
+    
+    <link rel="preload" href="../../assets/space-grotesk-latin-var-BhU9QXUp.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="../../assets/geist-mono-latin-var-XN7g48iV.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" crossorigin href="../../assets/styles-DUBBTpYI.css">
+    <title>Job funnel: eighteen boards, every twenty minutes, no scraping — Awon Aziz</title>
+    <meta name="description" content="Nearly every company careers page is a thin client over an applicant tracking system, and those systems publish the listings as JSON at a public endpoint. A scheduled workflow reads those endpoints, filters, dedupes against the previous run and commits the result to a static page.">
+    <link rel="canonical" href="https://awonaziz.github.io/project/job-funnel/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Job funnel: eighteen boards, every twenty minutes, no scraping">
+    <meta property="og:description" content="Nearly every company careers page is a thin client over an applicant tracking system, and those systems publish the listings as JSON at a public endpoint. A scheduled workflow reads those endpoints, filters, dedupes against the previous run and commits the result to a static page.">
+    <meta property="og:url" content="https://awonaziz.github.io/project/job-funnel/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Job funnel: eighteen boards, every twenty minutes, no scraping">
+    <meta name="twitter:description" content="Nearly every company careers page is a thin client over an applicant tracking system, and those systems publish the listings as JSON at a public endpoint. A scheduled workflow reads those endpoints, filters, dedupes against the previous run and commits the result to a static page.">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Person","@id":"https://awonaziz.github.io/#person","name":"Awon Aziz","jobTitle":"AI / MLOps engineer","description":"AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.","url":"https://awonaziz.github.io","email":"mailto:awonaziz786@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Islamabad","addressCountry":"PK"},"knowsAbout":["Python","NumPy","PyTorch","peft","ONNX","ONNX Runtime","FastAPI","pytest","DuckDB","SQLAlchemy","Pandas","Pydantic","Streamlit","Plotly","Ollama","qwen3:8b","sentence-transformers","SQLite","Prometheus","Docker","Chroma","CrewAI","Kubernetes","scikit-learn"],"alumniOf":[{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"IMCB F-8/4, Islamabad"}],"sameAs":["https://github.com/AwonAziz","https://www.linkedin.com/in/awonaziz","https://leetcode.com/AwonAziz","mailto:awonaziz786@gmail.com"]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Job funnel: eighteen boards, every twenty minutes, no scraping","description":"Nearly every company careers page is a thin client over an applicant tracking system, and those systems publish the listings as JSON at a public endpoint. A scheduled workflow reads those endpoints, filters, dedupes against the previous run and commits the result to a static page.","articleSection":"Engineering case study","datePublished":"2026-01-01","inLanguage":"en","url":"https://awonaziz.github.io/project/job-funnel/","mainEntityOfPage":{"@type":"WebPage","@id":"https://awonaziz.github.io/project/job-funnel/"},"author":{"@id":"https://awonaziz.github.io/#person"},"about":{"@id":"https://awonaziz.github.io/#person"},"keywords":"Python, GitHub Actions, GitHub Pages, requests","wordCount":391}]</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Overview","item":"https://awonaziz.github.io/"},{"@type":"ListItem","position":2,"name":"Systems","item":"https://awonaziz.github.io/projects/"},{"@type":"ListItem","position":3,"name":"Job funnel: eighteen boards, every twenty minutes, no scraping","item":"https://awonaziz.github.io/project/job-funnel/"}]}</script>
+  </head>
+  <body data-project="job-funnel">
+    <div id="root"></div>
+    <div data-static-project="job-funnel" hidden="" aria-hidden="true"><pre style="display:none">Job funnel: eighteen boards, every twenty minutes, no scraping
+Awon Aziz — AI / MLOps engineer. 2026. Running unattended since 16 Aug 2026 — 587 automated commits
+
+Nearly every company careers page is a thin client over an applicant tracking system, and those systems publish the listings as JSON at a public endpoint. A scheduled workflow reads those endpoints, filters, dedupes against the previous run and commits the result to a static page.
+
+THE HARD PART
+The largest job board in the world is outside the system, on purpose. LinkedIn's terms explicitly prohibit automated collection and they publish no readable public search API, so the funnel does not go near them. The correct cost was paying it.
+
+DECISIONS, AND WHAT EACH COST
+1. Two source tiers, labelled differently on the dashboard
+   Why: Tier one is company ATS endpoints (Greenhouse, Lever, Ashby, SmartRecruiters) — freshest signal. Tier two is aggregators — coverage of companies not on the list. The badge colour tells you which kind of result you are reading.
+   Cost: Tier one only works for the four supported systems. Workday and custom sites need a new parser written for them.
+2. Ambiguous locations are kept, not dropped
+   Why: A job survives the filter if its location matches the allow list OR if the location is missing or ambiguous. For a job search, wrongly dropping a real match is the expensive error.
+   Cost: Noise. A filter that never wrongly drops anything will sometimes keep something irrelevant.
+3. Seniority is tagged, not filtered
+   Why: Hiding senior roles is a toggle on the dashboard that remembers itself on that device. The pipeline does not get to decide what the reader is allowed to see.
+   Cost: One more piece of client state to carry.
+4. Failed sources are shown, not hidden
+   Why: Eight of eighteen sources currently return 404 for their board token. A wrong token fails quietly, and a failure that fails quietly belongs in view rather than looking like an oversight.
+   Cost: The dashboard permanently shows a row of red. It looks like a bug, and that is the point.
+5. If every source fails at once, the previous jobs.json is left alone
+   Why: An empty successful response is worse than no response. The commit only lands if the scan produced real data.
+   Cost: A stale page is possible if every source is genuinely dead for an extended period.
+
+DELIBERATELY NOT BUILT
+- No headless browser, no HTML scraping, no login replay.
+- No LinkedIn, Indeed, Wellfound or Turing. Those stay manual and the README says why.
+- The Ashby and SmartRecruiters parsers were written from documentation rather than a captured live response — flagged in known-limitations, not glossed.
+
+STACK: Python, GitHub Actions, GitHub Pages, requests
+
+METRICS
+- Sources polled: 18
+- Scan interval: 20 min
+- Automated commits: 587
+- Human commits, all time: 3
+- Runtime dependencies: requests only
+
+SOURCE
+- https://github.com/AwonAziz/cleanjobfunnel
+- https://awonaziz.github.io/cleanjobfunnel/
+
+Full case study: https://awonaziz.github.io/project/job-funnel/
+Contact: awonaziz786@gmail.com</pre></div>
+  </body>
+</html>

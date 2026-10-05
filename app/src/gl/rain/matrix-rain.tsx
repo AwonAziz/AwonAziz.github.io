@@ -115,9 +115,11 @@ export function MatrixRain({
       // Head near-white, trail a saturated phosphor. The head being the only
       // near-white cell is what makes the effect read as light through a medium
       // rather than as green noise. Both come from the live theme, so a palette
-      // change recolours the rain as well as the interface.
-      uColorHead: { value: new Color(colors.head.getHex()) },
-      uColorTail: { value: new Color(colors.trail.getHex()) },
+      // change recolours the rain as well as the interface. `useSceneColors`
+      // returns hex so the theme store stays clear of three; the conversion
+      // happens here, inside the canvas layer that already has it loaded.
+      uColorHead: { value: new Color(colors.head) },
+      uColorTail: { value: new Color(colors.trail) },
       uAtlas: { value: atlas?.texture },
     }),
     [atlas, quality.rainOpacity, colors],

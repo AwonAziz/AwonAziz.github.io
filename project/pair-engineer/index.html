@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" class="bg-canvas text-ink antialiased">
+  <head>
+    <script>(function () {
+  try {
+    var t = localStorage.getItem('devfolio-theme');
+    var p = localStorage.getItem('devfolio-palette');
+    var root = document.documentElement;
+    if (t === 'light' || t === 'dark') root.dataset.theme = t;
+    if (p && ["phosphor","glacier","ember","magenta","violet","lime"].indexOf(p) > -1 && p !== 'phosphor') {
+      root.dataset.palette = p;
+    }
+    // Suppress every transition for one frame, then allow them. Without this the
+    // first application animates each element's own transition-* and the page
+    // appears to flash.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { root.classList.add('theme-ready'); });
+    });
+  } catch (e) {
+    document.documentElement.classList.add('theme-ready');
+  }
+})();</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <script type="module" crossorigin src="../../assets/styles-rSwq4Jsr.js"></script>
+    <script type="module" crossorigin src="../../assets/entry-standalone-DCfJ6H4B.js"></script>
+    
+    <link rel="preload" href="../../assets/space-grotesk-latin-var-BhU9QXUp.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="../../assets/geist-mono-latin-var-XN7g48iV.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" crossorigin href="../../assets/styles-DUBBTpYI.css">
+    <title>AI pair engineer: four agents, and a budget on what each is told — Awon Aziz</title>
+    <meta name="description" content="A four-stage review pipeline that runs before a pull request exists: analyse, generate tests, refactor, then compare the original against the refactor and check behaviour survived. It stops at the report.">
+    <link rel="canonical" href="https://awonaziz.github.io/project/pair-engineer/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="AI pair engineer: four agents, and a budget on what each is told">
+    <meta property="og:description" content="A four-stage review pipeline that runs before a pull request exists: analyse, generate tests, refactor, then compare the original against the refactor and check behaviour survived. It stops at the report.">
+    <meta property="og:url" content="https://awonaziz.github.io/project/pair-engineer/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI pair engineer: four agents, and a budget on what each is told">
+    <meta name="twitter:description" content="A four-stage review pipeline that runs before a pull request exists: analyse, generate tests, refactor, then compare the original against the refactor and check behaviour survived. It stops at the report.">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Person","@id":"https://awonaziz.github.io/#person","name":"Awon Aziz","jobTitle":"AI / MLOps engineer","description":"AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.","url":"https://awonaziz.github.io","email":"mailto:awonaziz786@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Islamabad","addressCountry":"PK"},"knowsAbout":["Python","NumPy","PyTorch","peft","ONNX","ONNX Runtime","FastAPI","pytest","DuckDB","SQLAlchemy","Pandas","Pydantic","Streamlit","Plotly","Ollama","qwen3:8b","sentence-transformers","SQLite","Prometheus","Docker","Chroma","CrewAI","Kubernetes","scikit-learn"],"alumniOf":[{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"IMCB F-8/4, Islamabad"}],"sameAs":["https://github.com/AwonAziz","https://www.linkedin.com/in/awonaziz","https://leetcode.com/AwonAziz","mailto:awonaziz786@gmail.com"]},{"@context":"https://schema.org","@type":"TechArticle","headline":"AI pair engineer: four agents, and a budget on what each is told","description":"A four-stage review pipeline that runs before a pull request exists: analyse, generate tests, refactor, then compare the original against the refactor and check behaviour survived. It stops at the report.","articleSection":"Engineering case study","datePublished":"2026-01-01","inLanguage":"en","url":"https://awonaziz.github.io/project/pair-engineer/","mainEntityOfPage":{"@type":"WebPage","@id":"https://awonaziz.github.io/project/pair-engineer/"},"author":{"@id":"https://awonaziz.github.io/#person"},"about":{"@id":"https://awonaziz.github.io/#person"},"keywords":"Python, Pydantic, Streamlit, OpenRouter","wordCount":375}]</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Overview","item":"https://awonaziz.github.io/"},{"@type":"ListItem","position":2,"name":"Systems","item":"https://awonaziz.github.io/projects/"},{"@type":"ListItem","position":3,"name":"AI pair engineer: four agents, and a budget on what each is told","item":"https://awonaziz.github.io/project/pair-engineer/"}]}</script>
+  </head>
+  <body data-project="pair-engineer">
+    <div id="root"></div>
+    <div data-static-project="pair-engineer" hidden="" aria-hidden="true"><pre style="display:none">AI pair engineer: four agents, and a budget on what each is told
+Awon Aziz — AI / MLOps engineer. 2026. Shipped — 4 stages, 20 tests, never executes your code
+
+A four-stage review pipeline that runs before a pull request exists: analyse, generate tests, refactor, then compare the original against the refactor and check behaviour survived. It stops at the report.
+
+THE HARD PART
+The tool accepts arbitrary code from a stranger. It generates tests but never executes them, and submitted source is never interpolated into a shell command. Making this useful meant making it safe enough to point at code you did not write.
+
+DECISIONS, AND WHAT EACH COST
+1. Context is budgeted per stage, not broadcast to all of them
+   Why: The test engineer gets the source plus the analyzer's findings filtered to testing categories. The refactoring engineer gets findings filtered to maintainability. The reviewer gets both versions plus the tests. Fewer tokens, lower latency, and no upstream noise leaking into a stage's reasoning.
+   Cost: A filter that has to be maintained as categories change, and the risk that something genuinely cross-cutting gets withheld from the stage that needed it.
+2. No orchestration framework
+   Why: No LangChain, no LangGraph, no CrewAI, no AutoGen. Four prompt files, a client, and Pydantic models. For a linear pipeline a framework adds a dependency, an abstraction and a new set of failure modes in exchange for control flow that fits in one module.
+   Cost: Retries, parsing and error handling are hand-written. When the pipeline stops being linear this decision should be revisited rather than defended.
+3. Model output is validated against a schema, never trusted
+   Why: The parser handles raw JSON, fenced JSON, and JSON with stray prose. When parsing fails it retries with an explicit correction prompt rather than guessing. Malformed responses raise instead of producing a plausible-looking empty result.
+   Cost: More failure paths to handle, and a strictly narrower range of things the model is allowed to say.
+4. The final reviewer does not approve style
+   Why: A refactoring agent will always find something to rename. The reviewer checks behaviour preservation, correctness, complexity, testability and regressions — and explicitly rejects a change that is only cosmetic.
+   Cost: Real readability improvements that happen to be cosmetic get rejected along with the noise.
+
+DELIBERATELY NOT BUILT
+- No sandboxed execution. Listed as future work along with the resource limits it would need, rather than shipped and hoped about.
+- No merge capability. It produces a report, a person decides.
+- Temperature is pinned to 0.0–0.1 because code analysis has no use for variety.
+
+STACK: Python, Pydantic, Streamlit, OpenRouter
+
+METRICS
+- Stages: 4
+- Tests: 20
+- Orchestration dependencies: 0
+- Times it executes your code: 0
+
+SOURCE
+- https://github.com/AwonAziz/AI-Pair-Engineer
+
+Full case study: https://awonaziz.github.io/project/pair-engineer/
+Contact: awonaziz786@gmail.com</pre></div>
+  </body>
+</html>

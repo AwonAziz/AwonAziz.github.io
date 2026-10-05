@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" class="bg-canvas text-ink antialiased">
+  <head>
+    <script>(function () {
+  try {
+    var t = localStorage.getItem('devfolio-theme');
+    var p = localStorage.getItem('devfolio-palette');
+    var root = document.documentElement;
+    if (t === 'light' || t === 'dark') root.dataset.theme = t;
+    if (p && ["phosphor","glacier","ember","magenta","violet","lime"].indexOf(p) > -1 && p !== 'phosphor') {
+      root.dataset.palette = p;
+    }
+    // Suppress every transition for one frame, then allow them. Without this the
+    // first application animates each element's own transition-* and the page
+    // appears to flash.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { root.classList.add('theme-ready'); });
+    });
+  } catch (e) {
+    document.documentElement.classList.add('theme-ready');
+  }
+})();</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <script type="module" crossorigin src="../../assets/styles-rSwq4Jsr.js"></script>
+    <script type="module" crossorigin src="../../assets/entry-standalone-DCfJ6H4B.js"></script>
+    
+    <link rel="preload" href="../../assets/space-grotesk-latin-var-BhU9QXUp.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="../../assets/geist-mono-latin-var-XN7g48iV.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" crossorigin href="../../assets/styles-DUBBTpYI.css">
+    <title>LLM drift monitor: a production shift, replayed, with the alerts it should raise — Awon Aziz</title>
+    <meta name="description" content="Most monitoring demos compare two histograms. This watches a real LLM application — a banking support assistant — across a scripted production shift and answers the question a platform team actually has: did the system get worse, and what should we do about it?">
+    <link rel="canonical" href="https://awonaziz.github.io/project/llm-drift-monitor/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="LLM drift monitor: a production shift, replayed, with the alerts it should raise">
+    <meta property="og:description" content="Most monitoring demos compare two histograms. This watches a real LLM application — a banking support assistant — across a scripted production shift and answers the question a platform team actually has: did the system get worse, and what should we do about it?">
+    <meta property="og:url" content="https://awonaziz.github.io/project/llm-drift-monitor/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LLM drift monitor: a production shift, replayed, with the alerts it should raise">
+    <meta name="twitter:description" content="Most monitoring demos compare two histograms. This watches a real LLM application — a banking support assistant — across a scripted production shift and answers the question a platform team actually has: did the system get worse, and what should we do about it?">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Person","@id":"https://awonaziz.github.io/#person","name":"Awon Aziz","jobTitle":"AI / MLOps engineer","description":"AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.","url":"https://awonaziz.github.io","email":"mailto:awonaziz786@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Islamabad","addressCountry":"PK"},"knowsAbout":["Python","NumPy","PyTorch","peft","ONNX","ONNX Runtime","FastAPI","pytest","DuckDB","SQLAlchemy","Pandas","Pydantic","Streamlit","Plotly","Ollama","qwen3:8b","sentence-transformers","SQLite","Prometheus","Docker","Chroma","CrewAI","Kubernetes","scikit-learn"],"alumniOf":[{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"IMCB F-8/4, Islamabad"}],"sameAs":["https://github.com/AwonAziz","https://www.linkedin.com/in/awonaziz","https://leetcode.com/AwonAziz","mailto:awonaziz786@gmail.com"]},{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM drift monitor: a production shift, replayed, with the alerts it should raise","description":"Most monitoring demos compare two histograms. This watches a real LLM application — a banking support assistant — across a scripted production shift and answers the question a platform team actually has: did the system get worse, and what should we do about it?","articleSection":"Engineering case study","datePublished":"2026-01-01","inLanguage":"en","url":"https://awonaziz.github.io/project/llm-drift-monitor/","mainEntityOfPage":{"@type":"WebPage","@id":"https://awonaziz.github.io/project/llm-drift-monitor/"},"author":{"@id":"https://awonaziz.github.io/#person"},"about":{"@id":"https://awonaziz.github.io/#person"},"keywords":"Python, FastAPI, Ollama, qwen3:8b, sentence-transformers, SQLite, Streamlit, Prometheus, Docker","wordCount":634}]</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Overview","item":"https://awonaziz.github.io/"},{"@type":"ListItem","position":2,"name":"Systems","item":"https://awonaziz.github.io/projects/"},{"@type":"ListItem","position":3,"name":"LLM drift monitor: a production shift, replayed, with the alerts it should raise","item":"https://awonaziz.github.io/project/llm-drift-monitor/"}]}</script>
+  </head>
+  <body data-project="llm-drift-monitor">
+    <div id="root"></div>
+    <div data-static-project="llm-drift-monitor" hidden="" aria-hidden="true"><pre style="display:none">LLM drift monitor: a production shift, replayed, with the alerts it should raise
+Awon Aziz — AI / MLOps engineer. 2026. Shipped — 184 tests, 4 CI jobs, runs offline in ~50s
+
+Most monitoring demos compare two histograms. This watches a real LLM application — a banking support assistant — across a scripted production shift and answers the question a platform team actually has: did the system get worse, and what should we do about it?
+
+THE HARD PART
+Every drift detector was lying in a way that looked like a working detector. A logistic regression on raw 384-dim embeddings separates two samples of the same distribution at AUC 0.63 by exploiting sampling noise, so every window read as drift. The MMD permutation null was built on 400 points against a 1,400-point observation, so every window was significant. Accuracy was literally computed from itself and always returned 1.0. The hard part was not detecting drift — it was making each detector able to report no.
+
+DECISIONS, AND WHAT EACH COST
+1. Six embedding-drift detectors, not one
+   Why: Permutation-calibrated MMD catches shape change the marginals miss, sliced Wasserstein gives a threshold you can argue about, domain-classifier AUC answers the most decision-relevant question — could a model tell reference from today's traffic? — k-NN novelty converts an abstract distance into a number a product manager can act on, and the concept gap catches a vocabulary the reference never contained. They fail differently, and the disagreement is the signal.
+   Cost: Five thresholds to tune plus a voting rule, and a sixth detector firing does not mean a sixth problem.
+2. A permutation test confirms; it never escalates
+   Why: Severity comes from effect size. Significance only gates whether the window is allowed to raise drift at all. A p-value that drives a pager produces a pager that gets muted within a week.
+   Cost: A genuinely large effect in a small window can be missed, and the user has to wait for the next window.
+3. ECE and Brier alert on delta from the frozen baseline, never on absolute thresholds
+   Why: A model with a known calibration gap is not a new incident every window. Temperature scaling moved ECE from 0.149 to 0.043; without delta-based alerting that improvement would have generated a page on day one and every day after.
+   Cost: If the baseline itself is wrong, every comparison is wrong in the same direction and nothing looks wrong.
+4. The judge baseline is stamped with its model and rubric version
+   Why: Bumping qwen3:8b to qwen3:14b moves every score. Reading that as an application regression is how dashboards get ignored, so a change in either field invalidates cross-run comparison rather than silently re-baselining.
+   Cost: Model upgrades now require re-establishing the baseline, which is a deliberate step and an extra thing to forget.
+5. Stratified sampling always includes the out-of-scope slice
+   Why: Uniform sampling quietly evaluates only traffic the model can plausibly handle — and the regression you most need to catch is the one hiding in the slice you never judged.
+   Cost: A smaller effective sample per stratum, so the per-stratum confidence intervals are wider.
+6. Input drift and quality regression get different actions, encoded explicitly
+   Why: In the demo, windows 4–6 shift the input distribution while accuracy stays at 94%. The right move is to widen coverage and check the judge — explicitly not to retrain, because retraining cannot help while the new traffic is unlabelled.
+   Cost: The orchestrator has to reason about which signal dominates, which is the most opinionated part of the system.
+
+DELIBERATELY NOT BUILT
+- The judge is a local 8B model. It is real, not mocked, but a frontier judge would be more reliable. The backend interface is already pluggable.
+- The production shift, the out-of-scope mix and the 5% annotation noise are simulated. Banking77 gives real text, and the model and the quality metrics are real.
+- Windows are independent, not sequential. Real drift is autocorrelated and a production system would use EWMA control charts over the window series; the metric store is shaped for it.
+- No auth, no multi-tenancy, no distributed execution. It is a monitoring engine and a read model, not a control plane.
+
+STACK: Python, FastAPI, Ollama, qwen3:8b, sentence-transformers, SQLite, Streamlit, Prometheus, Docker
+
+METRICS
+- Tests, all offline: 184
+- Drift detectors: 6
+- API endpoints: 17
+- CI jobs: 4
+- Calibration bugs pinned by regression tests: 6
+- Real query intents: 27
+
+SOURCE
+- https://github.com/AwonAziz/llm-drift-monitor
+
+Full case study: https://awonaziz.github.io/project/llm-drift-monitor/
+Contact: awonaziz786@gmail.com</pre></div>
+  </body>
+</html>

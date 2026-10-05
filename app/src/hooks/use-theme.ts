@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Color } from "three";
 import {
   DEFAULT_PALETTE,
   DEFAULT_THEME,
@@ -149,7 +148,7 @@ export function useTheme() {
  * both. Re-reads on every theme change, and on a frame counter in case a
  * transition is still settling.
  */
-export function useSceneColors(): { background: Color; trail: Color; head: Color } {
+export function useSceneColors(): { background: string; trail: string; head: string } {
   const [colors, setColors] = useState(() => resolveSceneColors());
 
   useEffect(
@@ -163,13 +162,9 @@ export function useSceneColors(): { background: Color; trail: Color; head: Color
   return colors;
 }
 
-function resolveSceneColors() {
+function resolveSceneColors(): { background: string; trail: string; head: string } {
   if (typeof window === "undefined") {
-    return {
-      background: new Color("#020403"),
-      trail: new Color("#10b981"),
-      head: new Color("#d6fff0"),
-    };
+    return { background: "#020403", trail: "#10b981", head: "#d6fff0" };
   }
 
   const style = getComputedStyle(document.documentElement);
@@ -184,10 +179,10 @@ function resolveSceneColors() {
   const isLight = theme === "light";
 
   return {
-    background: new Color(readVar("--surface-0", "#020403")),
+    background: readVar("--surface-0", "#020403"),
     // In light mode the "bright" stop is the pale neon that is invisible on
     // white, so the trail falls back to the mid stop, which holds contrast.
-    trail: new Color(isLight ? ramp[0] : ramp[1]),
-    head: new Color(isLight ? ramp[1] : ramp[2]),
+    trail: isLight ? ramp[0] : ramp[1],
+    head: isLight ? ramp[1] : ramp[2],
   };
 }

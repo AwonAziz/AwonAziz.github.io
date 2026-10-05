@@ -1,6 +1,101 @@
 @import "tailwindcss";
 
 /* ===========================================================================
+   Typefaces — self-hosted, variable, three files
+   ===========================================================================
+   These were twelve static faces from `fonts.googleapis.com`: four weights of
+   Space Grotesk, four Newsreader weight/italic combinations, two Geist Mono
+   weights, each a separate request behind a render-blocking third-party
+   stylesheet. That is a DNS lookup, a TLS handshake and a connection to a
+   server the reader's business has no relationship with, on the critical path
+   of the first paint, before any of the page's own bytes arrive — and it
+   publishes the reader's IP address and referrer to a third party in the
+   process.
+
+   Three variable files replace all twelve, at 173 kB total:
+
+     space-grotesk-latin-var.woff2     22 kB   display + UI
+     geist-mono-latin-var.woff2        23 kB   values, labels, metrics
+     newsreader-latin-var.woff2        129 kB   prose
+
+   The Newsreader italic is deliberately absent. It was 143 kB — nearly half the
+   payload — and nothing on the site renders italic: there is no `<em>` and no
+   `italic` utility in the source. Dropping an unused 143 kB is a larger win
+   than any amount of request tuning on a face nobody sees.
+
+   **`font-display: optional`, not `swap`.** `swap` promises the fallback
+   immediately and swaps when the font lands, which is a layout shift by
+   construction — and CLS is the one Core Web Vital this page's typography can
+   actually cause. `optional` gives the font a 100 ms block period and, if it
+   misses, keeps the fallback for the whole page lifetime: no swap, no shift,
+   ever. The two above-the-fold families are preloaded for exactly that reason
+   — preloaded, they normally arrive inside the block period, so a first-time
+   visitor on a decent connection still sees the intended type. The trade is
+   deliberate: no flash of unstyled text in exchange for a hard zero on CLS.
+
+   Files are referenced from CSS rather than dropped in `public/` so Vite
+   content-hashes them and rewrites the URL relative to each document — which
+   matters here, because the case-study pages sit two directories deep and a
+   root-absolute font path would 404 on the Pages sub-path.
+   =========================================================================== */
+
+@font-face {
+  font-family: "Space Grotesk";
+  /* Registered high-level axis: the whole 300–700 range is one file, and
+     `font-weight` maps onto `wght` for free. `font-variation-settings` is
+     reserved for `opsz` below — using it on a registered axis silently breaks
+     `font-weight`. */
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: optional;
+  src: url("./fonts/space-grotesk-latin-var.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: optional;
+  src: url("./fonts/geist-mono-latin-var.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  /* Two axes: `wght` for the weight ramp and `opsz` for optical sizing, so
+     display type gets the tighter, higher-contrast cut and prose gets the
+     sturdier one from the same file. That is why this one is 129 kB and the
+     other two are ~22 kB, and it is why `font-optical-sizing` below is set to
+     `auto` rather than left at its initial `off`. */
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: optional;
+  src: url("./fonts/newsreader-latin-var.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Two faces, preloaded, out of three.
+   Space Grotesk is the display face and Geist Mono carries the values in the
+   first screenful — 45 kB together. Newsreader is not preloaded: it is prose,
+   it lives below the fold, and competing for bandwidth with the two faces that
+   are actually in the first viewport would make all three slower.
+
+   The preload is emitted by the Vite transform rather than written into
+   `index.html` by hand, so the hashed filename and the depth-relative path are
+   both correct on the nested documents without anyone maintaining three copies
+   of a link tag. */
+
+/* ===========================================================================
    Design system
    ===========================================================================
    Three type families, each with one job. This is the Siena Film Foundation
@@ -546,6 +641,41 @@ html:not(.theme-ready) *::after {
 }
 
 /**
+ * The no-WebGL atmosphere.
+ *
+ * Shown in two situations, both of which used to produce a black rectangle:
+ * a browser or device with no usable WebGL context, and a context lost after the
+ * scene was already running — a GPU driver reset, a laptop switching adapters,
+ * a mobile tab evicted from memory. The second one is the more common, and it is
+ * why this is not just a feature-detection branch.
+ *
+ * It has to look *deliberate*, because that is the whole difference between a
+ * fallback and a visible error. So it is a slow, very low-contrast wash in the
+ * live accent rather than a grey box: the page still reads as having atmosphere,
+ * the type still sits on an opaque scrim, and nothing about the layout shifts
+ * when it appears.
+ *
+ * No animation is applied under reduced motion, for the same reason the rain is
+ * paused there: ambient motion is exactly what the preference is asking to stop.
+ * It is also `forced-colors`-safe by construction — it is a background, so a
+ * forced-colours user simply sees the flat surface.
+ */
+@utility scene-fallback {
+  background-image:
+    radial-gradient(
+      58rem 42rem at 22% 8%,
+      color-mix(in oklab, var(--color-accent) 12%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      46rem 38rem at 88% 72%,
+      color-mix(in oklab, var(--color-accent-deep) 26%, transparent),
+      transparent 60%
+    );
+  background-color: var(--color-canvas);
+}
+
+/**
  * Scroll edge fade.
  *
  * A `mask-image` gradient at a container's top and bottom edges. It dissolves a
@@ -684,5 +814,102 @@ html:not(.theme-ready) *::after {
 
   .animate-drift {
     animation: none;
+  }
+}
+
+/* ===========================================================================
+   Contrast preferences
+   ===========================================================================
+   `prefers-reduced-motion` is not the only preference a site can get wrong, and
+   the two most-missed ones both matter more here than on a typical page because
+   this one is *dark by default* and leans on low-contrast hairlines.
+
+   `prefers-contrast: more` is Baseline and free, so there is no cost to
+   honouring it. Windows exposes it as "Contrast themes", macOS as "Increase
+   contrast", and it is the setting a reader reaches for when body text at 4.5:1
+   on a near-black background still feels thin.
+
+   What changes: borders and hairlines strengthen, because on this page they are
+   load-bearing — they are what separates a project row from the next one and a
+   metric from its label, and an `alpha(0.1)` white hairline on `#020403` is
+   roughly 1.4:1. Muted ink gets a nudge toward the full ink value for the same
+   reason. Nothing about layout or type size moves, so this costs no reflow.
+   =========================================================================== */
+
+@media (prefers-contrast: more) {
+  /* These four utilities carry 59 of the page's 59 borders, so strengthening
+     them here reaches the nav, the project rows, the metric grid, the decision
+     list and the scrims without any of them being individually touched. They
+     are overridden by specificity rather than by redefining a token because
+     the components address borders as Tailwind alpha utilities on `white`, not
+     through a semantic border variable.
+
+     `white/10` on the `#020403` canvas works out at roughly 1.4:1, which is
+     decorative by any reading — fine for a purely ornamental hairline, not fine
+     for the line that separates one project row from the next. */
+  .border-white\/8,
+  .border-white\/10 {
+    border-color: color-mix(in oklch, var(--ink-0) 52%, transparent) !important;
+  }
+
+  .border-white\/12,
+  .border-white\/20 {
+    border-color: color-mix(in oklch, var(--ink-0) 70%, transparent) !important;
+  }
+
+  /* 35 uses. `ink-faint` is the step that carries labels, metric keys and
+     timestamps, and it is the one most likely to sit under 4.5:1 on a near-black
+     background. Nudging it toward full ink costs nothing visually at these
+     sizes and closes the gap. */
+  .text-ink-faint {
+    color: color-mix(in oklch, var(--ink-0) 72%, var(--ink-2)) !important;
+  }
+
+  .text-ink-muted {
+    color: color-mix(in oklch, var(--ink-0) 88%, var(--ink-2)) !important;
+  }
+
+  /* The accent is the one thing that must not dim: it is how a link, a focus
+     ring and a value are told apart from ordinary prose. Left alone. */
+}
+
+/* ===========================================================================
+   Forced colours
+   ===========================================================================
+   Windows High Contrast. In this mode the browser discards author colours
+   entirely and substitutes its own palette — which means every `backdrop-filter`
+   on this page simply ceases to exist, and the glass surfaces it was applied to
+   become indistinguishable from the background they were floating above.
+
+   That is not hypothetical here: the rain toggle, the appearance menu and the
+   spotlight overlays are all `backdrop-blur`. Left alone they turn into opaque
+   rectangles the same colour as their surroundings, which is how a control ends
+   up invisible while still being focusable and clickable.
+
+   The fix is to stop relying on the effect for structure. A visible border
+   replaces the blur, and the system colours are left to do their job.
+   =========================================================================== */
+
+@media (forced-colors: active) {
+  /* The atmosphere is a background image. In forced-colours it is dropped, and
+     the flat system canvas is the correct outcome rather than a degraded one. */
+  .scene-fallback {
+    background-image: none;
+  }
+
+  /* Anything that was identifiable by its blur gets a border instead. */
+  .card,
+  [data-spotlight],
+  .status-dot {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+  }
+
+  /* Focus must remain visible in a mode where the default ring is often
+     suppressed. `Highlight` is the system selection colour and is guaranteed to
+     contrast with the system background in every High Contrast theme. */
+  :focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 }

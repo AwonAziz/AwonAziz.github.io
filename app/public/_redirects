@@ -1,8 +1,30 @@
 # ---------------------------------------------------------------------------
-#  Cloudflare Pages SPA fallback
+#  Cloudflare Pages / Netlify redirects
 # ---------------------------------------------------------------------------
-#  This site is a single page with anchor navigation and no client-side router,
-#  so it never actually hits a 404. This rule exists so that if a path is ever
-#  added later, a direct link to it still serves the app instead of a 404.
+#  There is deliberately no `/*  /index.html  200` catch-all any more.
+#
+#  It was there when this really was a single page with anchor navigation, and it
+#  was harmless then. With seven real case-study routes it stopped being a safety
+#  net and became a way to hide breakage: a mistyped or stale `/project/...` path
+#  would serve the overview with a 200 instead of failing, and the client would
+#  render the homepage because the document it received has no `data-project`
+#  attribute. A wrong page, returned as a success, to a crawler and to a person
+#  alike.
+#
+#  Every route on this site is a real file, so an unmatched path *should* 404.
+#  `404.html` handles it, and it lists all seven systems so a dead link still
+#  ends somewhere useful.
 # ---------------------------------------------------------------------------
-/*  /index.html  200
+
+# Legacy shape from the pre-routes version, so an old bookmark or a link pasted
+# into a hiring thread months ago still resolves to the real page rather than
+# hitting the 404. Scoped to the one known file instead of being a general rule,
+# because a general rule is the thing that was removed above.
+/project.html?id=llm-drift-monitor   /project/llm-drift-monitor/            301
+/project.html?id=from-scratch-to-served  /project/from-scratch-to-served/  301
+/project.html?id=eval-analytics      /project/eval-analytics/              301
+/project.html?id=incident-copilot    /project/incident-copilot/            301
+/project.html?id=job-funnel          /project/job-funnel/                  301
+/project.html?id=model-lifecycle     /project/model-lifecycle/             301
+/project.html?id=pair-engineer       /project/pair-engineer/               301
+/projects.html                      /projects/                            301

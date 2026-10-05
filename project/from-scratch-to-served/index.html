@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" class="bg-canvas text-ink antialiased">
+  <head>
+    <script>(function () {
+  try {
+    var t = localStorage.getItem('devfolio-theme');
+    var p = localStorage.getItem('devfolio-palette');
+    var root = document.documentElement;
+    if (t === 'light' || t === 'dark') root.dataset.theme = t;
+    if (p && ["phosphor","glacier","ember","magenta","violet","lime"].indexOf(p) > -1 && p !== 'phosphor') {
+      root.dataset.palette = p;
+    }
+    // Suppress every transition for one frame, then allow them. Without this the
+    // first application animates each element's own transition-* and the page
+    // appears to flash.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { root.classList.add('theme-ready'); });
+    });
+  } catch (e) {
+    document.documentElement.classList.add('theme-ready');
+  }
+})();</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <script type="module" crossorigin src="../../assets/styles-rSwq4Jsr.js"></script>
+    <script type="module" crossorigin src="../../assets/entry-standalone-DCfJ6H4B.js"></script>
+    
+    <link rel="preload" href="../../assets/space-grotesk-latin-var-BhU9QXUp.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="../../assets/geist-mono-latin-var-XN7g48iV.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" crossorigin href="../../assets/styles-DUBBTpYI.css">
+    <title>From scratch to served: a LoRA fine-tune where nothing is taken on trust — Awon Aziz</title>
+    <meta name="description" content="Most fine-tuning posts show a loss curve. This one shows a parity table. A reverse-mode autodiff written on NumPy, multi-head attention written out rather than called, LoRA on nn.Linear, then an ONNX export and a quantised FastAPI service — with each layer graded against the library it replaces and every number carrying an interval.">
+    <link rel="canonical" href="https://awonaziz.github.io/project/from-scratch-to-served/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="From scratch to served: a LoRA fine-tune where nothing is taken on trust">
+    <meta property="og:description" content="Most fine-tuning posts show a loss curve. This one shows a parity table. A reverse-mode autodiff written on NumPy, multi-head attention written out rather than called, LoRA on nn.Linear, then an ONNX export and a quantised FastAPI service — with each layer graded against the library it replaces and every number carrying an interval.">
+    <meta property="og:url" content="https://awonaziz.github.io/project/from-scratch-to-served/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="From scratch to served: a LoRA fine-tune where nothing is taken on trust">
+    <meta name="twitter:description" content="Most fine-tuning posts show a loss curve. This one shows a parity table. A reverse-mode autodiff written on NumPy, multi-head attention written out rather than called, LoRA on nn.Linear, then an ONNX export and a quantised FastAPI service — with each layer graded against the library it replaces and every number carrying an interval.">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Person","@id":"https://awonaziz.github.io/#person","name":"Awon Aziz","jobTitle":"AI / MLOps engineer","description":"AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.","url":"https://awonaziz.github.io","email":"mailto:awonaziz786@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Islamabad","addressCountry":"PK"},"knowsAbout":["Python","NumPy","PyTorch","peft","ONNX","ONNX Runtime","FastAPI","pytest","DuckDB","SQLAlchemy","Pandas","Pydantic","Streamlit","Plotly","Ollama","qwen3:8b","sentence-transformers","SQLite","Prometheus","Docker","Chroma","CrewAI","Kubernetes","scikit-learn"],"alumniOf":[{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"IMCB F-8/4, Islamabad"}],"sameAs":["https://github.com/AwonAziz","https://www.linkedin.com/in/awonaziz","https://leetcode.com/AwonAziz","mailto:awonaziz786@gmail.com"]},{"@context":"https://schema.org","@type":"TechArticle","headline":"From scratch to served: a LoRA fine-tune where nothing is taken on trust","description":"Most fine-tuning posts show a loss curve. This one shows a parity table. A reverse-mode autodiff written on NumPy, multi-head attention written out rather than called, LoRA on nn.Linear, then an ONNX export and a quantised FastAPI service — with each layer graded against the library it replaces and every number carrying an interval.","articleSection":"Engineering case study","datePublished":"2026-01-01","inLanguage":"en","url":"https://awonaziz.github.io/project/from-scratch-to-served/","mainEntityOfPage":{"@type":"WebPage","@id":"https://awonaziz.github.io/project/from-scratch-to-served/"},"author":{"@id":"https://awonaziz.github.io/#person"},"about":{"@id":"https://awonaziz.github.io/#person"},"keywords":"Python, NumPy, PyTorch, peft, ONNX, ONNX Runtime, FastAPI, pytest","wordCount":854}]</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Overview","item":"https://awonaziz.github.io/"},{"@type":"ListItem","position":2,"name":"Systems","item":"https://awonaziz.github.io/projects/"},{"@type":"ListItem","position":3,"name":"From scratch to served: a LoRA fine-tune where nothing is taken on trust","item":"https://awonaziz.github.io/project/from-scratch-to-served/"}]}</script>
+  </head>
+  <body data-project="from-scratch-to-served">
+    <div id="root"></div>
+    <div data-static-project="from-scratch-to-served" hidden="" aria-hidden="true"><pre style="display:none">From scratch to served: a LoRA fine-tune where nothing is taken on trust
+Awon Aziz — AI / MLOps engineer. 2026. Shipped — 80 tests, every layer checked against its reference, INT8 served on CPU
+
+Most fine-tuning posts show a loss curve. This one shows a parity table. A reverse-mode autodiff written on NumPy, multi-head attention written out rather than called, LoRA on nn.Linear, then an ONNX export and a quantised FastAPI service — with each layer graded against the library it replaces and every number carrying an interval.
+
+THE HARD PART
+A green test suite does not mean the thing is right. The first cross-entropy implementation used `logits - log(softmax(logits))`, which collapses algebraically to `logsumexp(logits)` — a per-row constant, blind to which class is the target. Loss fell smoothly while accuracy stayed pinned at chance, because argmax is scale-invariant. Gradient checking did not catch it: my analytic gradient and my numerical gradient agreed to 1e-10, because both were differentiating the same wrong function. The hard part was realising that gradient checking validates an implementation against its specification and cannot tell you the specification was wrong.
+
+DECISIONS, AND WHAT EACH COST
+1. Every layer is graded against the library it replaces
+   Why: Central differences for every op, torch.optim for the optimisers, nn.MultiheadAttention for attention, peft for LoRA, onnxruntime for the export. A hand-written implementation that is merely plausible is the normal failure mode; parity at 1e-09 and below is the only evidence that it is the same function.
+   Cost: Copying torch's fused in_proj_weight into the split projections to compare like with like, and maintaining the parity scripts as the reference libraries move. It is a standing maintenance cost, not a one-off.
+2. The comparison is paired, with confidence intervals and a significance test
+   Why: LoRA reached 0.9217 against 0.9295 for a full fine-tune while training 1.1% of the weights. McNemar's test on the paired predictions puts that gap at p = 0.006, so it is a real difference — and a small one. Reporting an accuracy table with no interval would have made the same gap look like either noise or a result.
+   Cost: Single seed per arm, so the method is conflated with its initialisation. That is named as the first thing to fix rather than left implicit.
+3. Calibration is treated as a first-class outcome, not a diagnostic
+   Why: LoRA came out better calibrated than full fine-tuning — ECE 0.0180 against 0.0306 — and the linear probe at 0.2650 is nowhere near either. A low-rank update constrains the weights to stay near the pretrained solution, so the logits move less far from whatever calibration was already there. If you are going to threshold on a predicted probability, the cheap method is the safer one to ship.
+   Cost: One model and one dataset. Nothing here establishes that the calibration ordering or the quantisation result generalises; each is a property of this graph until proven otherwise.
+4. Signed INT8 was diagnosed by sweeping eight configurations, not accepted
+   Why: The first serving run reported accuracy 0.9300 → 0.2610, which is chance. Rather than write 'quantisation hurt' and move on, a sweep found unsigned per-channel at 0.9280 and 98.4% agreement for a 4x size reduction. A Gemm-only configuration also scored 1.0000 and compressed nothing — which is what 'the ops you asked to quantise were not in the graph' looks like from the outside.
+   Cost: The per-layer mechanism is a plausible hypothesis, not an established result. The README says so in those words rather than implying the cause was proven.
+5. The LoRA target resolver raises instead of returning an empty list
+   Why: `inject_lora(targets=('q_proj','v_proj'))` silently matched nothing on DistilBERT, which calls them q_lin and v_lin. The run completed, reported 92% validation accuracy, and was in fact a linear probe wearing a LoRA label — the headline result was wrong. Now the resolver maps canonical names onto whatever the architecture calls them, injection raises on zero matches, and a run refuses to report any arm scoring at or below chance.
+   Cost: An arm that fails to load now stops the experiment instead of producing a number, which occasionally turns a working run into a stopped one.
+6. /health deliberately does not touch the model
+   Why: A liveness probe that loads the graph turns a slow cold start into an orchestrator restart loop. /ready is the endpoint that should fail until warm, and it is the one wired to the load balancer.
+   Cost: One more endpoint to reason about, and a health check that cannot tell you whether the weights are readable.
+
+DELIBERATELY NOT BUILT
+- Single seed per arm. The 0.78-point LoRA/full gap is significant by McNemar on 4,000 examples, but one seed conflates the method with its initialisation. Multiple seeds with mean and standard deviation is the next thing to fix.
+- Rank was not ablated. r ∈ {1,2,4,8,16} is the obvious next experiment and the single most-asked LoRA question.
+- One model, one dataset. DistilBERT on AG News, encoder-only — nothing here involves decoder-only attention, KV-cache serving or generation, which is where most current LLM serving work sits.
+- CPU only, single thread, and deliberately so: the figure is meant to measure latency rather than core count. There are no GPU serving numbers and no batching-under-load profile.
+- The two serving tests skip on a clean clone because the exported ONNX artefacts are 320 MB of regenerable output that .gitignore keeps out of the repository. The CI badge reports 78/2 rather than 80, which is the honest count for anyone who reads the log.
+
+STACK: Python, NumPy, PyTorch, peft, ONNX, ONNX Runtime, FastAPI, pytest
+
+METRICS
+- Tests, offline on CPU: 80
+- Worst gradient error: 5.9e-09
+- LoRA vs peft parity: 0.0
+- Trainable params: 741,124
+- Model size, fp32 → int8: 268.6 → 67.8 MB
+- p50 latency, fp32 → int8: 149.6 → 99.9 ms
+
+SOURCE
+- https://github.com/AwonAziz/from-scratch-to-served
+
+Full case study: https://awonaziz.github.io/project/from-scratch-to-served/
+Contact: awonaziz786@gmail.com</pre></div>
+  </body>
+</html>

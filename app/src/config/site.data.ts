@@ -45,22 +45,23 @@ export const site = validateSite({
     name: "Awon Aziz",
     role: "AI / MLOps engineer",
     description:
-      "Entry-level AI and MLOps engineer. Data-drift detection, champion/challenger promotion, agentic incident root-cause analysis with an evaluation harness, and scheduled automation that keeps working unattended.",
+      "AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.",
     url: env("VITE_SITE_URL", "https://awonaziz.github.io"),
-    location: "Rawalpindi, Pakistan",
+    location: "Islamabad, Pakistan",
     email: "awonaziz786@gmail.com",
   },
 
   headline: {
     claim: "I build the half of machine learning nobody demos.",
-    sub: "Entry-level AI/MLOps engineer. Drift detection and model promotion, retrieval that knows when to distrust itself, and a job funnel that has polled eighteen job boards every twenty minutes since August — unattended, public, and writing down what breaks.",
-    availability: "Open to remote, or relocation to UAE / Saudi Arabia / Qatar",
+    sub: "AI/MLOps engineer. A LoRA fine-tune on a hand-written NumPy autodiff, proved layer by layer against PyTorch and peft. Drift detectors built until each one can report no. An evaluation warehouse that fails CI rather than publish a stale number. Seven systems, all public, all writing down what broke.",
+    availability:
+      "Open to remote (EU or US overlap), or relocation to UAE / Saudi Arabia / Qatar / UK / EU",
     ctaPrimary: "Read the systems",
     ctaSecondary: "Check the evidence",
   },
 
   hero: {
-    rotating: ["Drift detection", "LLM-as-judge", "Model promotion", "Retrieval evals"],
+    rotating: ["Reference parity", "Drift detection", "Calibration", "Retrieval evals"],
     scrollHint: "Scroll to inspect",
   },
 
@@ -75,7 +76,12 @@ export const site = validateSite({
 
   marquee: [
     "Python",
+    "PyTorch",
+    "NumPy",
     "FastAPI",
+    "DuckDB",
+    "ONNX Runtime",
+    "SQLAlchemy",
     "Kubernetes",
     "MLflow",
     "Chroma",
@@ -113,16 +119,208 @@ export const site = validateSite({
       href: "mailto:awonaziz786@gmail.com",
       external: true,
     },
+    {
+      label: "Phone",
+      handle: "+92 335 5528211",
+      href: "tel:+923355528211",
+      external: false,
+    },
   ],
 
   stats: [
-    { label: "Systems, all public", value: "05" },
-    { label: "Tests across four systems", value: "282" },
-    { label: "Automated commits, unattended since 16 Aug", value: "486" },
-    { label: "Held-out anomalies the retrieval pipeline is scored against", value: "08" },
+    { label: "Systems, all public and runnable", value: "07" },
+    { label: "Tests across six of them", value: "506" },
+    { label: "Automated commits since 16 Aug, unattended", value: "587" },
+    { label: "Worst gradient error against central differences", value: "5.9e-09" },
   ],
 
   systems: [
+    {
+      slug: "from-scratch-to-served",
+      title: "From scratch to served: a LoRA fine-tune where nothing is taken on trust",
+      year: 2026,
+      status:
+        "Shipped — 80 tests, every layer checked against its reference, INT8 served on CPU",
+      summary:
+        "Most fine-tuning posts show a loss curve. This one shows a parity table. A reverse-mode autodiff written on NumPy, multi-head attention written out rather than called, LoRA on nn.Linear, then an ONNX export and a quantised FastAPI service — with each layer graded against the library it replaces and every number carrying an interval.",
+      constraint:
+        "A green test suite does not mean the thing is right. The first cross-entropy implementation used `logits - log(softmax(logits))`, which collapses algebraically to `logsumexp(logits)` — a per-row constant, blind to which class is the target. Loss fell smoothly while accuracy stayed pinned at chance, because argmax is scale-invariant. Gradient checking did not catch it: my analytic gradient and my numerical gradient agreed to 1e-10, because both were differentiating the same wrong function. The hard part was realising that gradient checking validates an implementation against its specification and cannot tell you the specification was wrong.",
+      diagram: `                  ┌────────────────────────────────────────────┐
+   spec ──────────►  │  phase 1  reverse-mode tape on NumPy       │
+   torch.optim ───►  │            checked vs central differences  │
+   nn.Multihead  ──►  │            worst error 5.9e-09            │
+   peft          ───►  └───────────────────┬────────────────────────┘
+   onnxruntime   ───►                      │  exact parity, 0.0
+                                           ▼
+   ┌────────────────────────────────────────────────────────────────┐
+   │  phase 3   W' = W + (α/r)·B·A          on nn.Linear directly    │
+   └───────────────────────────┬────────────────────────────────────┘
+                               │  merge() into base weights
+                               ▼
+   ┌────────────────────────────────────────────────────────────────┐
+   │  serving    ONNX export, dynamic batch/sequence               │
+   │             dynamic INT8, QUInt8 per-channel                  │
+   │             ONNX Runtime, CPU EP  ──►  FastAPI                │
+   │             268.6 MB ──► 67.8 MB     149.6 ms ──► 99.9 ms p50 │
+   └────────────────────────────────────────────────────────────────┘`,
+      decisions: [
+        {
+          decision: "Every layer is graded against the library it replaces",
+          why: "Central differences for every op, torch.optim for the optimisers, nn.MultiheadAttention for attention, peft for LoRA, onnxruntime for the export. A hand-written implementation that is merely plausible is the normal failure mode; parity at 1e-09 and below is the only evidence that it is the same function.",
+          cost: "Copying torch's fused in_proj_weight into the split projections to compare like with like, and maintaining the parity scripts as the reference libraries move. It is a standing maintenance cost, not a one-off.",
+        },
+        {
+          decision:
+            "The comparison is paired, with confidence intervals and a significance test",
+          why: "LoRA reached 0.9217 against 0.9295 for a full fine-tune while training 1.1% of the weights. McNemar's test on the paired predictions puts that gap at p = 0.006, so it is a real difference — and a small one. Reporting an accuracy table with no interval would have made the same gap look like either noise or a result.",
+          cost: "Single seed per arm, so the method is conflated with its initialisation. That is named as the first thing to fix rather than left implicit.",
+        },
+        {
+          decision: "Calibration is treated as a first-class outcome, not a diagnostic",
+          why: "LoRA came out better calibrated than full fine-tuning — ECE 0.0180 against 0.0306 — and the linear probe at 0.2650 is nowhere near either. A low-rank update constrains the weights to stay near the pretrained solution, so the logits move less far from whatever calibration was already there. If you are going to threshold on a predicted probability, the cheap method is the safer one to ship.",
+          cost: "One model and one dataset. Nothing here establishes that the calibration ordering or the quantisation result generalises; each is a property of this graph until proven otherwise.",
+        },
+        {
+          decision: "Signed INT8 was diagnosed by sweeping eight configurations, not accepted",
+          why: "The first serving run reported accuracy 0.9300 → 0.2610, which is chance. Rather than write 'quantisation hurt' and move on, a sweep found unsigned per-channel at 0.9280 and 98.4% agreement for a 4x size reduction. A Gemm-only configuration also scored 1.0000 and compressed nothing — which is what 'the ops you asked to quantise were not in the graph' looks like from the outside.",
+          cost: "The per-layer mechanism is a plausible hypothesis, not an established result. The README says so in those words rather than implying the cause was proven.",
+        },
+        {
+          decision: "The LoRA target resolver raises instead of returning an empty list",
+          why: "`inject_lora(targets=('q_proj','v_proj'))` silently matched nothing on DistilBERT, which calls them q_lin and v_lin. The run completed, reported 92% validation accuracy, and was in fact a linear probe wearing a LoRA label — the headline result was wrong. Now the resolver maps canonical names onto whatever the architecture calls them, injection raises on zero matches, and a run refuses to report any arm scoring at or below chance.",
+          cost: "An arm that fails to load now stops the experiment instead of producing a number, which occasionally turns a working run into a stopped one.",
+        },
+        {
+          decision: "/health deliberately does not touch the model",
+          why: "A liveness probe that loads the graph turns a slow cold start into an orchestrator restart loop. /ready is the endpoint that should fail until warm, and it is the one wired to the load balancer.",
+          cost: "One more endpoint to reason about, and a health check that cannot tell you whether the weights are readable.",
+        },
+      ],
+      metrics: [
+        { label: "Tests, offline on CPU", value: "80" },
+        { label: "Worst gradient error", value: "5.9e-09" },
+        { label: "LoRA vs peft parity", value: "0.0" },
+        { label: "Trainable params", value: "741,124" },
+        { label: "Model size, fp32 → int8", value: "268.6 → 67.8 MB" },
+        { label: "p50 latency, fp32 → int8", value: "149.6 → 99.9 ms" },
+      ],
+      stack: [
+        "Python",
+        "NumPy",
+        "PyTorch",
+        "peft",
+        "ONNX",
+        "ONNX Runtime",
+        "FastAPI",
+        "pytest",
+      ],
+      notBuilt: [
+        "Single seed per arm. The 0.78-point LoRA/full gap is significant by McNemar on 4,000 examples, but one seed conflates the method with its initialisation. Multiple seeds with mean and standard deviation is the next thing to fix.",
+        "Rank was not ablated. r ∈ {1,2,4,8,16} is the obvious next experiment and the single most-asked LoRA question.",
+        "One model, one dataset. DistilBERT on AG News, encoder-only — nothing here involves decoder-only attention, KV-cache serving or generation, which is where most current LLM serving work sits.",
+        "CPU only, single thread, and deliberately so: the figure is meant to measure latency rather than core count. There are no GPU serving numbers and no batching-under-load profile.",
+        "The two serving tests skip on a clean clone because the exported ONNX artefacts are 320 MB of regenerable output that .gitignore keeps out of the repository. The CI badge reports 78/2 rather than 80, which is the honest count for anyone who reads the log.",
+      ],
+      links: [
+        {
+          label: "from-scratch-to-served",
+          href: "https://github.com/AwonAziz/from-scratch-to-served",
+          external: true,
+        },
+      ],
+    },
+    {
+      slug: "eval-analytics",
+      title:
+        "Evaluation warehouse: six questions that are hard in a notebook and trivial in SQL",
+      year: 2026,
+      status: "Shipped — 141 tests, 5 migrations, a quality gate that fails CI",
+      summary:
+        "Every project here already writes evaluation artefacts — per-prediction arrays, serving reports, drift metrics. This puts them in a DuckDB star schema behind real migrations and answers the six questions that decide whether a model change was an improvement: LoRA against a full fine-tune, calibration by arm, INT8 against FP32, drift trend, error by document length, and which slices still lose.",
+      constraint:
+        "An evaluation number is only as trustworthy as the row underneath it. A warehouse that silently mixes measured telemetry with generated fixtures will eventually publish a synthetic result as though it were real, and nobody reviewing the dashboard will know which is which. So every row carries a `data_origin` column, rejected rows are counted rather than tolerated, and editing a migration that has already been applied raises instead of letting the schema drift away from what CI built.",
+      diagram: `   run artefacts (.npy, .json)  +  telemetry.db
+                    │
+              extract   reshape bytes ──► derive token counts, entropy
+                    │
+              land      stg_*_raw, every column nullable text
+                    │         so a bad row survives to be counted
+              validate  Pydantic contracts ──► ingestion_rejection
+                    │         (strict: unknown keys fail loudly)
+              transform conform dims · surrogate keys · slice projection
+                    │
+              load      typed marts  +  mart_freshness
+                    │
+              eap check ──► quality gate, run by CI on every push
+                    │   1 validation_rejections   (limit 0)
+                    │   2 referential_integrity
+                    │   3 mart_freshness         (per-mart, not global)
+                    │   4 last_ingestion_run
+                    │   5 analytical_coverage    (else the six
+                    │                            analyses are
+                    │                            quietly meaningless)`,
+      decisions: [
+        {
+          decision:
+            "Every row is labelled with where it came from, and the default build has only generated rows",
+          why: "The fine-tuning artefacts belong to a separate repository, so that module fabricates files of exactly those shapes from a fixed seed and `eap build` regenerates them byte-for-byte. Measured rows appear only when the upstream telemetry database is present — 5,140 per-request predictions, of which 2,762 carry a gold label and 2,378 are unlabelled production traffic kept with a NULL label rather than discarded or guessed at. Filter any figure to data_origin = 'real' to see only measured numbers.",
+          cost: "The headline figures on a fresh clone are from generated data. That is stated at the top of the README rather than in a footnote, and it is why the synthetic generator encodes specific findings instead of noise.",
+        },
+        {
+          decision: "The quality gate fails the build rather than warning in it",
+          why: "Five checks, and the fifth is the one that matters most: analytical coverage. Fewer than two arms, fewer than two quantisations, a missing slice family, no drift features, too few labelled predictions — each of those makes the six analyses quietly meaningless while every individual query still returns rows. A gate that only checked for orphans would pass a warehouse that had lost the ability to answer the question.",
+          cost: "Mart freshness is deliberately not a global frontier. Drift measurements legitimately extend past the evaluation date, so comparing every mart to the newest date in the warehouse would flag a complete build as stale. It is per-mart against its own staging table instead.",
+        },
+        {
+          decision:
+            "Rejected rows are counted, with machine-readable error codes and the raw payload",
+          why: "Contracts are strict about unknown keys, so a renamed upstream column fails loudly rather than passing silently. Bounds are mostly physical rather than statistical — confidence in [0,1], n_correct <= n_samples, accuracy inside its own confidence interval, trainable_params <= total_params. The default build must produce zero rejections and CI fails otherwise; the rejection path itself is exercised by tests against deliberately corrupted artefacts.",
+          cost: "A row that would have been quietly wrong is now a failed build. That is the intent, but it means upstream schema changes surface as red rather than as a subtly different number.",
+        },
+        {
+          decision:
+            "Surrogate keys are BLAKE2b over the natural grain, not the database's hash()",
+          why: "Identical inputs then produce identical keys, which makes a diff of the warehouse a meaningful review artifact. A content-dependent hash would make every rebuild look like a total rewrite.",
+          cost: "Key derivation has to be applied consistently in the transform layer, and an out-of-band insert that skips it produces orphans the gate will catch.",
+        },
+        {
+          decision: "/sql is restricted rather than trusted",
+          why: "Single statement, must begin with SELECT or WITH, write and DDL keywords rejected, row cap enforced. Fifteen blocked statements are asserted in the test suite, so the guard cannot rot as the keyword list grows.",
+          cost: "The read-only surface is narrower than a real analyst would want, and widening it means widening the blocklist.",
+        },
+      ],
+      metrics: [
+        { label: "Tests, hermetic by default", value: "141" },
+        { label: "Versioned SQL migrations", value: "5" },
+        { label: "Analyses behind the API", value: "6" },
+        { label: "Blocked SQL statements asserted", value: "15" },
+        { label: "Charts in the dashboard", value: "17" },
+        { label: "Quality-gate checks", value: "5" },
+      ],
+      stack: [
+        "Python",
+        "DuckDB",
+        "SQLAlchemy",
+        "Pandas",
+        "Pydantic",
+        "FastAPI",
+        "Streamlit",
+        "Plotly",
+      ],
+      notBuilt: [
+        "The fine-tune artefacts are generated, not measured. Real numbers replace them by dropping files into data/raw/ with no code change, but a fresh clone has only the synthetic rows.",
+        "INT8 quantisation is approximated by rounding pre-softmax activations onto a group-wise symmetric grid. It reproduces realistic disagreement rates; it is not a simulation of a particular kernel.",
+        "Bootstrap intervals resample documents, which is the right unit for a paired comparison but does not capture variance across training runs. One training run per arm is modelled.",
+        "Ingestion is single-writer and local. There is no scheduler, no incremental partition strategy and no warehouse anyone else writes to.",
+      ],
+      links: [
+        {
+          label: "eval-analytics-platform",
+          href: "https://github.com/AwonAziz/eval-analytics-platform",
+          external: true,
+        },
+      ],
+    },
     {
       slug: "llm-drift-monitor",
       title: "LLM drift monitor: a production shift, replayed, with the alerts it should raise",
@@ -139,12 +337,14 @@ export const site = validateSite({
                                         │
                  ┌──────────────────────┴───────────────────────┐
                  ▼                                              ▼
-        EMBEDDING DRIFT                                 OUTPUT QUALITY
-        MMD ─► sliced Wasserstein                        accuracy · macro-F1
-        domain-classifier AUC                             ECE · Brier · abstention
-        normalised Fréchet                                in-scope vs out-of-scope
-        k-NN novelty rate                                 label-free proxies
-                 │                                              │
+         EMBEDDING DRIFT                  OUTPUT QUALITY                 │
+         MMD, permutation-calibrated      accuracy · macro-F1 · AUC      │
+         sliced Wasserstein               ECE · MCE · adaptive-ECE       │
+         domain-classifier AUC            Brier · reliability curves     │
+         normalised Fréchet               abstention · per-intent damage │
+         k-NN novelty rate                in-scope vs out-of-scope       │
+         concept gap                      label-free proxies             │
+                  │                                              │
                  └──────────────┬───────────────────────────────┘
                                 ▼
                      LLM-AS-JUDGE  (qwen3:8b, local)
@@ -157,9 +357,9 @@ export const site = validateSite({
                      noop │ investigate │ retrain │ rollback`,
       decisions: [
         {
-          decision: "Five embedding-drift detectors, not one",
-          why: "MMD catches shape change the marginals miss, sliced Wasserstein gives a threshold you can argue about, domain-classifier AUC answers the most decision-relevant question — could a model tell reference from today's traffic? — and k-NN novelty converts an abstract distance into a number a product manager can act on. They fail differently, and the disagreement is the signal.",
-          cost: "Four thresholds to tune plus a voting rule, and a fifth detector firing does not mean a fifth problem.",
+          decision: "Six embedding-drift detectors, not one",
+          why: "Permutation-calibrated MMD catches shape change the marginals miss, sliced Wasserstein gives a threshold you can argue about, domain-classifier AUC answers the most decision-relevant question — could a model tell reference from today's traffic? — k-NN novelty converts an abstract distance into a number a product manager can act on, and the concept gap catches a vocabulary the reference never contained. They fail differently, and the disagreement is the signal.",
+          cost: "Five thresholds to tune plus a voting rule, and a sixth detector firing does not mean a sixth problem.",
         },
         {
           decision: "A permutation test confirms; it never escalates",
@@ -191,10 +391,10 @@ export const site = validateSite({
       ],
       metrics: [
         { label: "Tests, all offline", value: "184" },
-        { label: "Drift detectors", value: "5" },
+        { label: "Drift detectors", value: "6" },
         { label: "API endpoints", value: "17" },
         { label: "CI jobs", value: "4" },
-        { label: "Bugs pinned by regression tests", value: "12" },
+        { label: "Calibration bugs pinned by regression tests", value: "6" },
         { label: "Real query intents", value: "27" },
       ],
       stack: [
@@ -226,7 +426,7 @@ export const site = validateSite({
       slug: "incident-copilot",
       title: "Incident copilot: retrieval that knows when to distrust itself",
       year: 2026,
-      status: "Advisory only — three builds, 35 tests on the current one",
+      status: "Advisory only — three builds, 38 tests on the current one",
       summary:
         "An anomaly detector tells you a metric is strange. It does not tell you why, and it has no memory. This searches a postmortem knowledge base for incidents that resembled this one and puts a drafted root-cause hypothesis in front of a human.",
       constraint:
@@ -260,7 +460,7 @@ export const site = validateSite({
         },
       ],
       metrics: [
-        { label: "Tests, current build", value: "35" },
+        { label: "Tests, current build", value: "38" },
         { label: "Held-out eval cases", value: "8" },
         { label: "Builds superseded", value: "3" },
         { label: "Auto-remediation paths", value: "0" },
@@ -293,7 +493,7 @@ export const site = validateSite({
       slug: "job-funnel",
       title: "Job funnel: eighteen boards, every twenty minutes, no scraping",
       year: 2026,
-      status: "Running unattended since 16 Aug 2026 — 486 automated commits",
+      status: "Running unattended since 16 Aug 2026 — 587 automated commits",
       summary:
         "Nearly every company careers page is a thin client over an applicant tracking system, and those systems publish the listings as JSON at a public endpoint. A scheduled workflow reads those endpoints, filters, dedupes against the previous run and commits the result to a static page.",
       constraint:
@@ -328,7 +528,8 @@ export const site = validateSite({
       metrics: [
         { label: "Sources polled", value: "18" },
         { label: "Scan interval", value: "20 min" },
-        { label: "Automated commits", value: "486" },
+        { label: "Automated commits", value: "587" },
+        { label: "Human commits, all time", value: "3" },
         { label: "Runtime dependencies", value: "requests only" },
       ],
       stack: ["Python", "GitHub Actions", "GitHub Pages", "requests"],
@@ -459,9 +660,18 @@ export const site = validateSite({
       question: "Can I actually run any of this without a GPU, an API key, or a cloud account?",
       points: [
         "Yes. `llm-drift-monitor` has `make demo-fast` — 14 windows, offline encoder, deterministic mock judge, about 50 seconds, no model download and no network.",
-        "`make demo` is the same structure with a real local LLM judge via Ollama. Still no API key, and nothing leaves your machine.",
-        "`cleanjobfunnel` has one dependency, `requests`. The incident copilot stands up with zero downloads.",
-        "Three of the five systems run end to end with no key and no network, and that is a design constraint rather than a coincidence.",
+        "`from-scratch-to-served` is `python -m pytest tests -q` — 80 tests offline on CPU in about 25 seconds. On a fresh clone 78 run and 2 skip, because the two serving tests need exported ONNX artefacts that are 320 MB of regenerable output and gitignored. The badge reports 78/2 rather than 80 because that is the honest count for anyone reading the log.",
+        "`cleanjobfunnel` has one dependency, `requests`. The evaluation warehouse needs no upstream database at all — its suite is hermetic by default.",
+        "Four of the seven systems run end to end with no key and no network, and that is a design constraint rather than a coincidence.",
+      ],
+    },
+    {
+      question: "How do you know the numbers are real?",
+      points: [
+        "Everything quantitative in this page is either read at runtime by your own browser or openable in a repository. Nothing here is a claim you have to take on trust.",
+        "The hand-written autodiff is graded against central differences (worst error 5.9e-09) and against `torch.optim`. The attention is graded against `nn.MultiheadAttention` at 1.19e-07. The LoRA implementation matches Hugging Face `peft` exactly, 0.0. Those are reference implementations, not my own opinion of correctness.",
+        "Comparisons that could be noise are paired and tested: the LoRA-against-full-fine-tune gap carries a McNemar p of 0.006, and the evaluation warehouse resamples documents for bootstrap intervals rather than quoting a point estimate.",
+        "Where a number is generated rather than measured, the repository says so in the same sentence. The evaluation warehouse labels every row with a `data_origin` column precisely so a synthetic figure can never be read as a measured one.",
       ],
     },
     {
@@ -469,6 +679,7 @@ export const site = validateSite({
       points: [
         "Every detector had to be made able to report no. That was the actual engineering problem: the domain-classifier null sat at 0.63 instead of 0.50, so every window looked like drift until PCA was fitted on the reference first.",
         "The MMD permutation null was computed on 400 points against a 1,400-point observation, which made every window significant. Both nulls are now regression tests.",
+        "Six calibration bugs in total are pinned by regression tests, including a tautological accuracy computation that always returned 1.0 and a missing veto cap on the judge.",
         "A permission test now sits in the demo: a 2× traffic spike with an identical intent mix fires nothing. A detector that pages on volume gets muted within a week, so that window is the one that proves the others.",
         "Significance gates whether a window may raise drift; severity always comes from effect size.",
       ],
@@ -478,8 +689,8 @@ export const site = validateSite({
         "You have no commercial employment history. Why should anyone take this seriously?",
       points: [
         "That is a fair question, and it is why the page leads with the artifacts rather than a biography.",
-        "Every number is either read at runtime by your own browser or openable in a repository. Nothing on this page is a claim you have to take on trust.",
-        "The no-go log lists twelve bugs found in the drift monitor and the design changes they forced, each pinned by a regression test. A project that has never failed is a project nobody has run.",
+        "The no-go log is the argument. It lists the bugs this work found in itself — the log-softmax shortcut that made loss fall while accuracy stayed at chance, the signed quantisation that took the model to chance, the LoRA target resolver that silently matched nothing — each with the design change it forced.",
+        "A project that has never failed is a project nobody has run.",
         "I would rather be the person on a team who ships the drift detector and the runbook than the person who claims five years of it.",
       ],
     },
@@ -495,32 +706,47 @@ export const site = validateSite({
   practice: [
     {
       index: "01",
-      title: "Negative results get written down",
-      body: "When the hybrid retriever's dense half ranked worse than sparse on two of eight cases, that became a documented constant with a threshold and an explanation, not a quietly deleted branch. A system whose flaws are only discovered by whoever runs it next is worth less than one whose flaws are on the tin.",
-      evidence: "Hybrid-retrieval · corpus-size trust gate, with the failing cases named",
+      title: "Nothing is taken on trust, including by me",
+      body: "The autodiff is graded against central differences. Attention is graded against `nn.MultiheadAttention`. LoRA is graded against Hugging Face `peft` and matches it exactly. ONNX predictions are graded against PyTorch at 1.0000 agreement. Where a claim could have been checked and was not, the gap shows up as a bug: a linear probe was quietly reporting itself as a LoRA run, and a log-softmax shortcut was making the loss fall while accuracy stayed at chance.",
+      evidence: "from-scratch-to-served · worst gradient error 5.9e-09, peft parity 0.0",
     },
     {
       index: "02",
-      title: "Limitations live in the README, not a footnote",
-      body: "Which parsers were verified against live responses and which were written from documentation. Which numbers came from a fallback embedder. Which knowledge base is synthetic. Where mock-mode output should not be believed. A reviewer should not have to email me to learn what a project cannot do.",
-      evidence:
-        "cleanjobfunnel · known-limitations, and the eight red sources on the dashboard",
+      title: "Negative results get written down",
+      body: "When the hybrid retriever's dense half ranked worse than sparse on two of eight cases, that became a documented constant with a threshold and an explanation, not a quietly deleted branch. When signed INT8 quantisation took the model to chance accuracy, the fix came from sweeping eight configurations rather than from accepting the first result. A system whose flaws are only discovered by whoever runs it next is worth less than one whose flaws are on the tin.",
+      evidence: "Hybrid-retrieval · corpus-size trust gate, with the failing cases named",
     },
     {
       index: "03",
-      title: "Everything runs without a key",
-      body: "Five systems, and three of them stand up end to end with no API key and no network, because a project nobody can run is a project nobody will read. The two that need a model say so on their first line.",
-      evidence: "pip install -r requirements.txt, then run it — no account",
+      title: "A number that could be synthetic says so in the same sentence",
+      body: "The evaluation warehouse carries a `data_origin` column on every row, so a generated figure can never be read as a measured one, and filtering to 'real' shows only what was actually observed. The committed severe drift report is manufactured on purpose and its header says so. The quantisation mechanism is labelled a hypothesis in the code because the effect is reproducible and the per-layer cause is not established.",
+      evidence:
+        "eval-analytics-platform · data_origin on every row; llm-drift-monitor · inject_drift.py",
     },
     {
       index: "04",
       title: "Scope boundaries are drawn on purpose",
-      body: "The incident copilot advises and never remediates. The pair engineer generates tests and never executes them. The job funnel leaves LinkedIn alone. In each case the repository states the reason, because a boundary without a reason reads as an oversight.",
-      evidence: "Three READMEs, each with an explicit 'what this does not do'",
+      body: "The incident copilot advises and never remediates. The pair engineer generates tests and never executes them. The job funnel leaves LinkedIn alone. The warehouse's default build has only generated rows until a real database is pointed at it. In each case the repository states the reason, because a boundary without a reason reads as an oversight.",
+      evidence: "Four READMEs, each with an explicit 'what this does not do'",
     },
   ],
 
   nogolog: [
+    {
+      date: "Oct 2026",
+      title: "The loss went down and the model learned nothing",
+      body: "The first cross-entropy implementation used `logits - log(softmax(logits))`, which collapses to `logsumexp(logits)` — a per-row constant, completely blind to which class was the target. Logits grew, so logsumexp grew, so the loss fell, while argmax stayed pinned at chance because argmax is scale-invariant. Gradient checking did not catch it: my analytic gradient and my numerical gradient agreed to 1e-10, because both were differentiating the same wrong function. Gradient checking tells you an implementation matches its specification; only an independent ground truth can tell you the specification was wrong. There is now a regression test that exists purely to guard that shortcut.",
+    },
+    {
+      date: "Oct 2026",
+      title: "Quantisation destroyed the model, and then the fix was found by sweeping",
+      body: "The first INT8 serving run reported accuracy 0.9300 → 0.2610, which is chance. Instead of writing 'quantisation hurt' and moving on, eight configurations were swept against the same fp32 reference: unsigned per-channel held 0.9280 at 98.4% agreement for a 4x size reduction, while signed per-tensor collapsed. The mechanism is plausible — a symmetric grid spanning [-128, 127] wastes half its range on a one-sided channel — and it is stated as a hypothesis in the code, because I verified the effect reproducibly and did not prove the per-layer reason. A sixth configuration scored a perfect 1.0000 and compressed nothing, which is what 'the ops you asked to quantise were not in the graph' looks like from the outside.",
+    },
+    {
+      date: "Oct 2026",
+      title: "A linear probe was wearing a LoRA label",
+      body: "`inject_lora(targets=('q_proj','v_proj'))` silently matched nothing on DistilBERT, which calls them q_lin and v_lin. The run completed, reported 92% validation accuracy, and was in fact a linear probe — the headline result of the experiment was wrong. Three permanent fixes: the resolver maps canonical names onto whatever the architecture calls them, injection raises instead of returning an empty list, and a run refuses to report any arm scoring at or below chance, because exactly-chance means a checkpoint failed to load, which is a completely different finding.",
+    },
     {
       date: "Aug 2026",
       title: "The dense retriever made the system worse, so it gets switched off",
@@ -607,12 +833,16 @@ export const site = validateSite({
 
   currently: [
     {
-      title: "LangGraph, specifically human-in-the-loop",
-      body: "The hybrid retrieval build ends at an Approve/Dismiss button with no state behind it. The next version should loop a dismissed report back for re-investigation and write an approved one into the knowledge base as a new postmortem. The eval harness already accepts a pipeline function, so both versions can be scored against the same eight cases.",
+      title: "Multiple seeds, and an ablation of the rank",
+      body: "The fine-tune ran one seed per arm, so the 0.78-point LoRA-against-full gap is significant by McNemar on 4,000 examples but the method is conflated with its initialisation. r ∈ {1, 2, 4, 8, 16} is also unablated, and it is the single most-asked LoRA question. Both are named as the next thing to fix in the repository's own limitations rather than left for a reviewer to notice.",
     },
     {
-      title: "LoRA fine-tuning in PyTorch",
-      body: "Learning the training side properly rather than only the serving side. Everything above this line is inference and operations; this is the part I have only read about.",
+      title: "Real telemetry into the evaluation warehouse",
+      body: "The warehouse already labels every row with its origin and will pick up measured data the moment an upstream database is present — 5,140 per-request predictions, of which 2,378 are unlabelled traffic currently kept with a NULL label. Pointing it at the drift monitor's real store is a path change, not a rewrite. What I want to find out is whether the generated findings survive contact with real numbers.",
+    },
+    {
+      title: "LangGraph, specifically human-in-the-loop",
+      body: "The hybrid retrieval build ends at an Approve/Dismiss button with no state behind it. The next version should loop a dismissed report back for re-investigation and write an approved one into the knowledge base as a new postmortem. The eval harness already accepts a pipeline function, so both versions can be scored against the same eight cases.",
     },
     {
       title: "An indie fighting game, 70+ characters",
@@ -626,7 +856,7 @@ export const site = validateSite({
       issuer: "Al Nafi International Colleges",
       year: "2026",
       detail:
-        "RQF Level 6 · 90% at the oral defence. The word that matters in the title is Operations — it is not a course about model architectures, it is a course about what has to exist around a model for it to survive real infrastructure.",
+        "EduQual (UK) · RQF Level 6, the bachelor's-level equivalent · 90%. The word that matters in the title is Operations — it is not a course about model architectures, it is a course about what has to exist around a model for it to survive real infrastructure.",
     },
     {
       name: "Machine Learning Certification",
@@ -668,12 +898,13 @@ export const site = validateSite({
     heading: "Open to AI engineering and AIOps roles",
     email: "awonaziz786@gmail.com",
     cta: "Send an email",
-    availability: "Remote, or relocation to UAE / Saudi Arabia / Qatar",
+    availability:
+      "Remote (EU or US overlap), or relocation to UAE / Saudi Arabia / Qatar / UK / EU",
     note: "The fastest way to judge whether this is a fit is to open one of the repositories and read the limitations section. I would rather be the person on a team who ships the drift detector and the runbook than the person who claims five years of it.",
   },
 
   footer: {
-    note: "Rawalpindi, Pakistan. No analytics, no cookies, no tracking.",
+    note: "Islamabad, Pakistan. No analytics, no cookies, no tracking.",
     colophon:
       "Vite · React 19 · TypeScript · Tailwind v4 · GSAP · Lenis · React Three Fiber · custom GLSL. Every number on this page is read at runtime or openable in a repository.",
   },

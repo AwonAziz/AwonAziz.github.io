@@ -12,7 +12,7 @@
   # deliberately strict: it names the four origins the page actually needs and
   # nothing else. If you add an analytics script, amend `connect-src` and
   # `script-src` here or it will be blocked in production and nowhere else.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://awonaziz.github.io; worker-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://awonaziz.github.io; worker-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'
 
   # The page fetches its live telemetry from two origins. Everything else is
   # same-origin, so the default is 'self' and the exceptions are named.

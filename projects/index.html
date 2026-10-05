@@ -23,99 +23,105 @@
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#0a1211" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!--
-      Three families, three jobs, and none of them is the Space Mono costume:
-        Space Grotesk  display + UI. A proportional cut of Space Mono, tuned for
-                       non-display sizes, so it keeps the technical letterforms
-                       without reading as a screenshot of a terminal.
-        Newsreader     prose. A long-form serif reads as a hiring document, which
-                       is what this page actually is.
-        Geist Mono     values only: counts, timestamps, versions, paths. Never a
-                       sentence — that rule is what keeps the engineering register
-                       from becoming a costume.
-
-      display=swap on all three. The canvas paints immediately and the type
-      resolves in place; blocking the first paint on three families would cost
-      LCP for text that has a perfectly good fallback.
-    -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist+Mono:wght@400;500&display=swap"
-    />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
     <title>Systems — Awon Aziz</title>
     <meta
       name="description"
-      content="Entry-level AI and MLOps engineer. Embedding and output-quality drift, an LLM-as-judge regression suite, champion/challenger promotion, and scheduled automation that has run unattended for weeks."
+      content="Seven public systems: a LoRA fine-tune proved against its reference implementations, a drift monitor built until each detector can report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks."
     />
-    <!-- A coherent default for non-JS crawlers; src/hooks/use-seo.ts rewrites
-         it from the same validated config the page renders. -->
-    <meta property="og:type" content="profile" />
-    <meta property="og:title" content="Awon Aziz — AI / MLOps engineer" />
+    <!--
+      This document mounts from `entry-standalone.tsx`, not `main.tsx`, and the
+      noscript copy below is the reason that split is worth having: it is the
+      only part of the site a reader without JavaScript gets, so it carries the
+      full argument rather than a summary. Each system is a real URL, and the
+      injected per-page text on each of those pages is the case study in full.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Systems — Awon Aziz" />
     <meta
       property="og:description"
-      content="Drift detection, model promotion, retrieval evaluation, incident triage. Public, runnable, tested — and where something did not work, it says so."
+      content="Seven public, runnable systems, each opening on the hard part and listing what it deliberately does not do."
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Awon Aziz — AI / MLOps engineer" />
+    <meta name="twitter:title" content="Systems — Awon Aziz" />
     <meta
       name="twitter:description"
-      content="Drift detection, model promotion, retrieval evaluation, incident triage."
+      content="Seven public, runnable systems, each opening on the hard part and listing what it deliberately does not do."
     />
-    <script type="module" crossorigin src="../assets/rolldown-runtime-hePW80VL.js"></script>
-    <script type="module" crossorigin src="../assets/r3f-Bw1ovoNK.js"></script>
-    <script type="module" crossorigin src="../assets/motion-DK0jnyGZ.js"></script>
-    <script type="module" crossorigin src="../assets/vendor-BmJXtDW4.js"></script>
-    <script type="module" crossorigin src="../assets/main-6L1hHGoj.js"></script>
-    <link rel="stylesheet" crossorigin href="../assets/motion-fOJvfYOR.css">
-    <link rel="stylesheet" crossorigin href="../assets/main-qizUNDfi.css">
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Awon Aziz","jobTitle":"AI / MLOps engineer","description":"Entry-level AI and MLOps engineer. Data-drift detection, champion/challenger promotion, agentic incident root-cause analysis with an evaluation harness, and scheduled automation that keeps working unattended.","url":"https://awonaziz.github.io","email":"mailto:awonaziz786@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Rawalpindi","addressCountry":"PK"},"knowsAbout":["Python","FastAPI","Ollama","qwen3:8b","sentence-transformers","SQLite","Streamlit","Prometheus","Docker","Chroma","CrewAI","Kubernetes","scikit-learn","GitHub Actions","GitHub Pages","requests","MLflow","Evidently AI","SciPy","Pydantic","OpenRouter"],"alumniOf":[{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"IMCB F-8/4, Islamabad"}],"sameAs":["https://github.com/AwonAziz","https://www.linkedin.com/in/awonaziz","https://leetcode.com/AwonAziz","mailto:awonaziz786@gmail.com"]}</script>
+    <script type="module" crossorigin src="../assets/styles-rSwq4Jsr.js"></script>
+    <script type="module" crossorigin src="../assets/entry-standalone-DCfJ6H4B.js"></script>
+    
+    <link rel="preload" href="../assets/space-grotesk-latin-var-BhU9QXUp.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="../assets/geist-mono-latin-var-XN7g48iV.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" crossorigin href="../assets/styles-DUBBTpYI.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://awonaziz.github.io/#person","name":"Awon Aziz","jobTitle":"AI / MLOps engineer","description":"AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.","url":"https://awonaziz.github.io","email":"mailto:awonaziz786@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Islamabad","addressCountry":"PK"},"knowsAbout":["Python","NumPy","PyTorch","peft","ONNX","ONNX Runtime","FastAPI","pytest","DuckDB","SQLAlchemy","Pandas","Pydantic","Streamlit","Plotly","Ollama","qwen3:8b","sentence-transformers","SQLite","Prometheus","Docker","Chroma","CrewAI","Kubernetes","scikit-learn"],"alumniOf":[{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"IMCB F-8/4, Islamabad"}],"sameAs":["https://github.com/AwonAziz","https://www.linkedin.com/in/awonaziz","https://leetcode.com/AwonAziz","mailto:awonaziz786@gmail.com"]}</script>
   </head>
   <body>
     <div id="root"></div>
-    <!--
-      There is no preloader on this site, deliberately.
-
-      A gate that delays the first readable sentence was on the previous version
-      and it was the single worst decision in it. Full-screen entrance
-      animations are named as a disqualifier in portfolio screening for an
-      obvious reason: a one-second loader is a one-second delay, and the hero
-      headline is the only positioning asset an engineer without an employment
-      history has. The WebGL scene lazy-loads behind a gradient instead, so the
-      atmosphere arrives after the content rather than in front of it.
-    -->
     <noscript>
-      <div style="padding: 4rem; max-width: 44rem; font-family: Georgia, serif; line-height: 1.7">
+      <div style="padding: 4rem; max-width: 46rem; font-family: Georgia, serif; line-height: 1.7">
         <h1 style="font-family: system-ui, sans-serif">Awon Aziz — AI / MLOps engineer</h1>
         <p>
-          This site renders a WebGL scene and needs JavaScript. The work does not — all five
-          systems are public, and the limitations of each are written in its README.
+          This site renders a WebGL scene on the overview and needs JavaScript for its navigation.
+          The work does not — all seven systems are public, and the limitations of each are
+          written in its README.
         </p>
         <ul>
-          <li><a href="https://github.com/AwonAziz/llm-drift-monitor">llm-drift-monitor</a> — embedding drift, output-quality drift and an LLM-as-judge regression suite; 184 tests, all offline</li>
-          <li><a href="https://github.com/AwonAziz/cleanjobfunnel">cleanjobfunnel</a> — eighteen job boards, every twenty minutes, running unattended since August</li>
-          <li><a href="https://github.com/AwonAziz/ml-lifecycle-platform">ml-lifecycle-platform</a> — drift detection and a promotion gate that can refuse</li>
-          <li><a href="https://github.com/AwonAziz/Hybrid-retrieval">Hybrid-retrieval</a> — retrieval that switches off half of itself below a corpus threshold</li>
-          <li><a href="https://github.com/AwonAziz/AI-Pair-Engineer">AI-Pair-Engineer</a> — four review agents that never execute your code</li>
+          <li>
+            <a href="https://github.com/AwonAziz/from-scratch-to-served">from-scratch-to-served</a> —
+            LoRA fine-tuning on a hand-written NumPy autodiff, exported to ONNX and quantised to INT8;
+            every layer checked against its reference, 80 tests, offline on CPU
+          </li>
+          <li>
+            <a href="https://github.com/AwonAziz/eval-analytics-platform">eval-analytics-platform</a> —
+            a DuckDB star-schema warehouse over run artefacts and telemetry, behind a five-check
+            quality gate; 141 hermetic tests
+          </li>
+          <li>
+            <a href="https://github.com/AwonAziz/llm-drift-monitor">llm-drift-monitor</a> — embedding
+            drift, output-quality drift and an LLM-as-judge regression suite; 184 tests, all offline
+          </li>
+          <li>
+            <a href="https://github.com/AwonAziz/Hybrid-retrieval">Hybrid-retrieval</a> — retrieval
+            that switches off half of itself below a corpus threshold
+          </li>
+          <li>
+            <a href="https://github.com/AwonAziz/cleanjobfunnel">cleanjobfunnel</a> — eighteen job
+            boards, every twenty minutes, running unattended since August
+          </li>
+          <li>
+            <a href="https://github.com/AwonAziz/ml-lifecycle-platform">ml-lifecycle-platform</a> —
+            drift detection and a promotion gate that can refuse
+          </li>
+          <li>
+            <a href="https://github.com/AwonAziz/AI-Pair-Engineer">AI-Pair-Engineer</a> — four review
+            agents that never execute your code
+          </li>
         </ul>
-        <p>Contact: <a href="mailto:awonaziz786@gmail.com">awonaziz786@gmail.com</a></p>
+        <p>
+          Contact: <a href="mailto:awonaziz786@gmail.com">awonaziz786@gmail.com</a> · Islamabad,
+          Pakistan. Open to remote (EU or US overlap), or relocation to UAE / Saudi Arabia / Qatar /
+          UK / EU.
+        </p>
       </div>
     </noscript>
-    <div data-static-summary="" hidden="" aria-hidden="true"><pre style="display:none">Awon Aziz — AI / MLOps engineer. Rawalpindi, Pakistan.
-Entry-level AI and MLOps engineer. Data-drift detection, champion/challenger promotion, agentic incident root-cause analysis with an evaluation harness, and scheduled automation that keeps working unattended.
+    <div data-static-summary="" hidden="" aria-hidden="true"><pre style="display:none">Awon Aziz — AI / MLOps engineer. Islamabad, Pakistan.
+AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.
 
 Systems:
+- From scratch to served: a LoRA fine-tune where nothing is taken on trust (2026, Shipped — 80 tests, every layer checked against its reference, INT8 served on CPU). Stack: Python, NumPy, PyTorch, peft, ONNX, ONNX Runtime, FastAPI, pytest. Most fine-tuning posts show a loss curve. This one shows a parity table. A reverse-mode autodiff written on NumPy, multi-head attention written out rather than called, LoRA on nn.Linear, then an ONNX export and a quantised FastAPI service — with each layer graded against the library it replaces and every number carrying an interval.
+- Evaluation warehouse: six questions that are hard in a notebook and trivial in SQL (2026, Shipped — 141 tests, 5 migrations, a quality gate that fails CI). Stack: Python, DuckDB, SQLAlchemy, Pandas, Pydantic, FastAPI, Streamlit, Plotly. Every project here already writes evaluation artefacts — per-prediction arrays, serving reports, drift metrics. This puts them in a DuckDB star schema behind real migrations and answers the six questions that decide whether a model change was an improvement: LoRA against a full fine-tune, calibration by arm, INT8 against FP32, drift trend, error by document length, and which slices still lose.
 - LLM drift monitor: a production shift, replayed, with the alerts it should raise (2026, Shipped — 184 tests, 4 CI jobs, runs offline in ~50s). Stack: Python, FastAPI, Ollama, qwen3:8b, sentence-transformers, SQLite, Streamlit, Prometheus, Docker. Most monitoring demos compare two histograms. This watches a real LLM application — a banking support assistant — across a scripted production shift and answers the question a platform team actually has: did the system get worse, and what should we do about it?
-- Incident copilot: retrieval that knows when to distrust itself (2026, Advisory only — three builds, 35 tests on the current one). Stack: Python, Chroma, CrewAI, FastAPI, Kubernetes, scikit-learn. An anomaly detector tells you a metric is strange. It does not tell you why, and it has no memory. This searches a postmortem knowledge base for incidents that resembled this one and puts a drafted root-cause hypothesis in front of a human.
-- Job funnel: eighteen boards, every twenty minutes, no scraping (2026, Running unattended since 16 Aug 2026 — 486 automated commits). Stack: Python, GitHub Actions, GitHub Pages, requests. Nearly every company careers page is a thin client over an applicant tracking system, and those systems publish the listings as JSON at a public endpoint. A scheduled workflow reads those endpoints, filters, dedupes against the previous run and commits the result to a static page.
+- Incident copilot: retrieval that knows when to distrust itself (2026, Advisory only — three builds, 38 tests on the current one). Stack: Python, Chroma, CrewAI, FastAPI, Kubernetes, scikit-learn. An anomaly detector tells you a metric is strange. It does not tell you why, and it has no memory. This searches a postmortem knowledge base for incidents that resembled this one and puts a drafted root-cause hypothesis in front of a human.
+- Job funnel: eighteen boards, every twenty minutes, no scraping (2026, Running unattended since 16 Aug 2026 — 587 automated commits). Stack: Python, GitHub Actions, GitHub Pages, requests. Nearly every company careers page is a thin client over an applicant tracking system, and those systems publish the listings as JSON at a public endpoint. A scheduled workflow reads those endpoints, filters, dedupes against the previous run and commits the result to a static page.
 - Model lifecycle: drift, retrain, and a promotion that can be refused (2026, Shipped — 43 tests, 3 drift measures, synthetic data). Stack: Python, FastAPI, MLflow, Evidently AI, SciPy, Streamlit, Docker. A model that passes every test and still quietly becomes wrong is the failure mode CI cannot see. The service stays healthy, no test fails, and the predictions stop meaning anything. This is the machinery for catching that.
 - AI pair engineer: four agents, and a budget on what each is told (2026, Shipped — 4 stages, 20 tests, never executes your code). Stack: Python, Pydantic, Streamlit, OpenRouter. A four-stage review pipeline that runs before a pull request exists: analyse, generate tests, refactor, then compare the original against the refactor and check behaviour survived. It stops at the report.
 
 Repositories:
+- https://github.com/AwonAziz/from-scratch-to-served
+- https://github.com/AwonAziz/eval-analytics-platform
 - https://github.com/AwonAziz/llm-drift-monitor
 - https://github.com/AwonAziz/Hybrid-retrieval
 - https://github.com/AwonAziz/agentic-incident-copilot
