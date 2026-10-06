@@ -54,11 +54,11 @@ export function ReticleCursor() {
     //   lead  eases toward the real pointer quickly, so clicking feels accurate
     //   trail eases toward `lead` slowly, so the page has weight
     //
-    // These read `pointer.clientX / clientY` — viewport pixels. An earlier
-    // version read `ndcX / ndcY`, which are -1..1 with Y positive upward, and
-    // scaled them by half the viewport while negating Y. The result tracked the
-    // pointer backwards on both axes: mouse up, cursor down.
-    const lead = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    // Initialize at the *current* pointer position (if available) rather than
+    // the viewport center. Starting at the center makes the reticle appear to
+    // "snap from the middle" when the user first moves the mouse, which reads
+    // as a glitch. The `pointer` module already tracks the last known position.
+    const lead = { x: pointer.clientX, y: pointer.clientY };
     const trail = { ...lead };
 
     // On the shared frame bus rather than its own rAF. This component ran a
