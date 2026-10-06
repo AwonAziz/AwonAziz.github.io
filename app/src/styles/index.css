@@ -736,7 +736,7 @@ html:not(.theme-ready) *::after {
     box-shadow:
       0 0 0 1px color-mix(in oklab, var(--color-accent) calc(var(--a) * 70%), transparent),
       0 0 calc(14px + var(--a) * 26px)
-        color-mix(in oklab, var(--color-accent) calc(var(--a) * 34%), transparent);
+      color-mix(in oklab, var(--color-accent) calc(var(--a) * 34%), transparent);
   }
 }
 

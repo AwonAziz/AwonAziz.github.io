@@ -13,7 +13,7 @@ import {
   buildStaticSummary,
   projectPath,
 } from "./src/lib/seo-static";
-import { THEME_BOOT_SCRIPT, APPROACH_BOOT_SCRIPT } from "./src/lib/theme";
+import { APPROACH_BOOT_SCRIPT, THEME_BOOT_SCRIPT } from "./src/lib/theme";
 
 /**
  * ---------------------------------------------------------------------------
