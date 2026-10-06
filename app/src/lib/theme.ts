@@ -88,14 +88,94 @@ export const THEME_BOOT_SCRIPT = `
     if (p && ${JSON.stringify(PALETTE_IDS)}.indexOf(p) > -1 && p !== '${DEFAULT_PALETTE}') {
       root.dataset.palette = p;
     }
-    // Suppress every transition for one frame, then allow them. Without this the
-    // first application animates each element's own transition-* and the page
-    // appears to flash.
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { root.classList.add('theme-ready'); });
-    });
+    setTimeout(function () { root.classList.add('theme-ready'); }, 0);
   } catch (e) {
     document.documentElement.classList.add('theme-ready');
   }
 })();
 `.trim();
+
+/**
+ * Global approach handler — runs once per page, tracks all elements with
+ * `data-approach-radius` and updates their `--a` custom property based on
+ * pointer proximity. This is separate from React to avoid hydration issues.
+ */
+export const APPROACH_BOOT_SCRIPT = `
+console.log('[ApproachHandler] script loaded');
+(function () {
+  // Attach state to window so it can be accessed from outside the IIFE
+  window.__approachElements = new Map();
+  window.__approachFrame = 0;
+  window.__approachLastPointer = { x: -99999, y: -99999 };
+
+  function paint() {
+    let anyActive = false;
+    window.__approachElements.forEach((radius, node) => {
+      const rect = node.getBoundingClientRect();
+      const dx = Math.max(0, Math.abs(window.__approachLastPointer.x - (rect.left + rect.width / 2)) - rect.width / 2);
+      const dy = Math.max(0, Math.abs(window.__approachLastPointer.y - (rect.top + rect.height / 2)) - rect.height / 2);
+      const distance = Math.hypot(dx, dy);
+      const proximity = Math.max(0, Math.min(1, 1 - distance / radius));
+      const leaving = proximity < (node._approachValue || 0);
+      const rate = leaving ? 0.35 : 0.18;
+      const value = (node._approachValue || 0) + (proximity - (node._approachValue || 0)) * rate;
+      node._approachValue = value;
+      if (value > 0.001) {
+        node.style.setProperty("--a", value.toFixed(4));
+        anyActive = true;
+      } else {
+        node.style.removeProperty("--a");
+      }
+    });
+    if (!anyActive && window.__approachFrame) {
+      clearInterval(window.__approachFrame);
+      window.__approachFrame = 0;
+    }
+  }
+
+  function onPointerMove(e) {
+    window.__approachLastPointer = { x: e.clientX, y: e.clientY };
+    if (!window.__approachFrame) window.__approachFrame = setInterval(paint, 16);
+  }
+
+  function onPointerLeave() {
+    window.__approachLastPointer = { x: -99999, y: -99999 };
+    if (!window.__approachFrame) window.__approachFrame = setInterval(paint, 16);
+  }
+
+  function register() {
+    document.querySelectorAll('[data-approach-radius]').forEach((node) => {
+      const radius = parseFloat(node.dataset.approachRadius);
+      if (!isNaN(radius) && !window.__approachElements.has(node)) {
+        window.__approachElements.set(node, radius);
+        node._approachValue = 0;
+      }
+    });
+    if (window.__approachElements.size && !window.__approachFrame) {
+      window.__approachFrame = setInterval(paint, 16);
+    }
+  }
+
+  // Expose register globally so it can be called after hydration
+  window.__approachRegister = register;
+
+  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  window.addEventListener("pointerleave", onPointerLeave);
+  window.addEventListener("blur", onPointerLeave);
+
+  // Register immediately (may be empty if React hasn't hydrated yet)
+  register();
+
+  // Fallback: keep trying to register for a few seconds after load,
+  // in case React hydration happens after this script runs.
+  let registerAttempts = 0;
+  const registerInterval = setInterval(() => {
+    register();
+    registerAttempts++;
+    if (registerAttempts >= 20) clearInterval(registerInterval);
+  }, 100);
+
+  // MutationObserver as backup for dynamic content
+  new MutationObserver(register).observe(document.body, { childList: true, subtree: true });
+})();
+`;

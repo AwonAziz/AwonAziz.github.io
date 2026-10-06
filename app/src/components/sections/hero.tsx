@@ -4,8 +4,8 @@ import { site } from "@/config/site.data";
 import { cn } from "@/lib/cn";
 import { motionBlocked } from "@/lib/motion-prefs";
 import { gsap, SplitText } from "@/providers/smooth-scroll";
+import { Approach } from "../ui/approach";
 import { DecodeText } from "../ui/decode-text";
-import { Magnetic } from "../ui/magnetic";
 import { VelocityMarquee } from "../ui/marquee";
 import { Reveal } from "../ui/reveal";
 
@@ -195,11 +195,21 @@ export function Hero() {
           </Reveal>
 
           <div data-hero-fade className="flex flex-wrap items-center gap-3">
-            <Magnetic strength={0.26} padding={70}>
+            {/*
+              `Approach` rather than `Magnetic`. The magnet pulls once the cursor is
+              already inside the bounds, which reads as a snap; this ramps from
+              ~130px out, so the button is already lifting while the pointer is
+              still approaching it. That is the difference between an effect and a
+              reaction to one.
+
+              Two elements in this view carry the effect, which is the budget — the
+              rest of the hero already has the headline decode and the marquee.
+            */}
+            <Approach radius={140}>
               <a
                 href="#systems"
                 data-cursor-label="Read"
-                className="group inline-flex items-center gap-3 rounded-pill bg-accent px-6 py-3.5 font-mono text-small font-medium on-accent"
+                className="group relative inline-flex items-center gap-3 rounded-pill bg-accent px-6 py-3.5 font-mono text-small font-medium on-accent transition-shadow duration-300"
               >
                 {site.headline.ctaPrimary}
                 <svg
@@ -215,9 +225,9 @@ export function Hero() {
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               </a>
-            </Magnetic>
+            </Approach>
 
-            <Magnetic strength={0.26} padding={70}>
+            <Approach radius={140}>
               <a
                 href="#runtime"
                 data-cursor-label="Live"
@@ -226,7 +236,7 @@ export function Hero() {
                 <span aria-hidden="true" className="status-dot status-ok animate-pulse-dot" />
                 {site.headline.ctaSecondary}
               </a>
-            </Magnetic>
+            </Approach>
           </div>
         </div>
 

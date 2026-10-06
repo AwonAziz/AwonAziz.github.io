@@ -38,6 +38,35 @@ function fnv1a(value: string): number {
 
 const SIZE = 7;
 
+/**
+ * A hue derived from the slug, so each system is identifiable by colour as well
+ * as by shape.
+ *
+ * **Used only on thin marks, index numbers and a single hairline** — never as a
+ * fill, never on body copy. Seven hues across seven cards is a rainbow if they
+ * carry content; as small marks and rules they read as individually identified
+ * objects sharing one system, which is what they are for.
+ *
+ * The band is deliberately narrow and the lightness/chroma fixed. A wide hue
+ * spread across `oklch` at fixed L and C produces greens that look radioactive and
+ * blues that look broken, because equal L and C does not mean equal *perceived*
+ * intensity across the wheel. Keeping a ~100° window sidesteps that: every value
+ * in it holds up against the same near-black surface and the same text contrast.
+ *
+ * Two slugs are pushed 180° apart on the wheel so adjacent cards never collide,
+ * which matters because the grid order is the systems order.
+ */
+export function projectHue(slug: string): number {
+  const hash = fnv1a(slug);
+  const band = 150;
+  return Math.round(96 + (hash % band));
+}
+
+/** A second, opposed value for the same slug — used for the mark's focus cell. */
+export function projectHueAlt(slug: string): number {
+  return (projectHue(slug) + 180) % 360;
+}
+
 export interface SystemMarkProps {
   slug: string;
   className?: string;
@@ -96,7 +125,15 @@ export function SystemMark({ slug, className }: SystemMarkProps) {
       focusable="false"
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       className={className}
-      style={{ display: "block", width: "1em", height: "1em" }}
+      // The mark carries its system's hue. Overridden from `currentColor` here so
+      // a caller cannot accidentally flatten every mark to the page accent, which
+      // is exactly what made the earlier list read as one undifferentiated run.
+      style={{
+        display: "block",
+        width: "1em",
+        height: "1em",
+        color: `oklch(76% 0.14 ${projectHue(slug)})`,
+      }}
     >
       {cells}
     </svg>

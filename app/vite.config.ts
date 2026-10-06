@@ -13,7 +13,7 @@ import {
   buildStaticSummary,
   projectPath,
 } from "./src/lib/seo-static";
-import { THEME_BOOT_SCRIPT } from "./src/lib/theme";
+import { THEME_BOOT_SCRIPT, APPROACH_BOOT_SCRIPT } from "./src/lib/theme";
 
 /**
  * ---------------------------------------------------------------------------
@@ -269,6 +269,11 @@ function projectPages(): Plugin {
           },
           {
             tag: "script",
+            children: APPROACH_BOOT_SCRIPT,
+            injectTo: "head-prepend",
+          },
+          {
+            tag: "script",
             attrs: { type: "application/ld+json" },
             children: JSON.stringify([buildPersonSchema(), buildProjectSchema(system)]),
             injectTo: "head",
@@ -379,6 +384,12 @@ function staticInjection(): Plugin {
           tag: "script",
           attrs: {},
           children: THEME_BOOT_SCRIPT,
+          injectTo: "head-prepend",
+        },
+        {
+          tag: "script",
+          attrs: {},
+          children: APPROACH_BOOT_SCRIPT,
           injectTo: "head-prepend",
         },
         {

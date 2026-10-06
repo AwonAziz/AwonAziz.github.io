@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { type System, site } from "@/config/site.data";
 import { cn } from "@/lib/cn";
 import { link, projectHref, ROUTES } from "@/lib/paths";
+import { Approach } from "../ui/approach";
 import { Reveal } from "../ui/reveal";
 import { Spotlight } from "../ui/spotlight";
-import { SystemMark } from "../ui/system-mark";
+import { projectHue, SystemMark } from "../ui/system-mark";
 
 /**
  * ---------------------------------------------------------------------------
@@ -203,7 +204,24 @@ export function ProjectDetail({ initialSlug }: { initialSlug: string | null }) {
   const siblings = site.systems.filter((item) => item.slug !== system.slug);
 
   return (
-    <article className="pt-28">
+    <article
+      className="pt-28 relative isolate"
+      style={
+        {
+          "--color-accent": `oklch(76% 0.14 ${projectHue(system.slug)})`,
+        } as React.CSSProperties
+      }
+    >
+      {/* Large hero watermark — the project's mark at massive scale behind the
+          header, tinted to the project's hue. This is the "per-project distinct
+          visual identity" the brief asks for: a reader who has three tabs open
+          can tell which project they're on by colour alone, before reading a
+          word. Positioned behind the header text so it never competes with
+          legibility. */}
+      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 -z-10 opacity-[0.04] select-none md:-top-24 lg:-top-32">
+        <SystemMark slug={system.slug} className="text-[14rem] md:text-[18rem]" />
+      </div>
+
       {/* Sibling navigation. Seven sibling pages with no cross-link is the
           failure mode the research names as the reason a case study gets read
           once and never again: a reader who finishes one has to go back to an
@@ -438,32 +456,36 @@ export function ProjectDetail({ initialSlug }: { initialSlug: string | null }) {
         className="mt-10 grid gap-px overflow-hidden rounded-card border border-white/10 bg-white/10 sm:grid-cols-2"
       >
         {previous ? (
-          <a
-            href={projectHref(previous.slug)}
-            className="group flex flex-col gap-2 bg-canvas-raised px-6 py-6 transition-colors duration-300 hover:bg-canvas-raised/60"
-          >
-            <span className="label-mono flex items-center gap-2 text-ink-faint">
-              <span aria-hidden="true">←</span> Previous
-            </span>
-            <span className="text-body leading-snug text-ink transition-colors group-hover:text-accent">
-              {previous.title}
-            </span>
-          </a>
+          <Approach radius={120}>
+            <a
+              href={projectHref(previous.slug)}
+              className="group flex flex-col gap-2 bg-canvas-raised px-6 py-6 transition-colors duration-300 hover:bg-canvas-raised/60"
+            >
+              <span className="label-mono flex items-center gap-2 text-ink-faint">
+                <span aria-hidden="true">←</span> Previous
+              </span>
+              <span className="text-body leading-snug text-ink transition-colors group-hover:text-accent">
+                {previous.title}
+              </span>
+            </a>
+          </Approach>
         ) : (
           <span className="hidden bg-canvas-raised/40 px-6 py-6 sm:block" />
         )}
         {next ? (
-          <a
-            href={projectHref(next.slug)}
-            className="group flex flex-col items-end gap-2 bg-canvas-raised px-6 py-6 text-right transition-colors duration-300 hover:bg-canvas-raised/60"
-          >
-            <span className="label-mono flex items-center gap-2 text-ink-faint">
-              Next <span aria-hidden="true">→</span>
-            </span>
-            <span className="text-body leading-snug text-ink transition-colors group-hover:text-accent">
-              {next.title}
-            </span>
-          </a>
+          <Approach radius={120}>
+            <a
+              href={projectHref(next.slug)}
+              className="group flex flex-col items-end gap-2 bg-canvas-raised px-6 py-6 text-right transition-colors duration-300 hover:bg-canvas-raised/60"
+            >
+              <span className="label-mono flex items-center gap-2 text-ink-faint">
+                Next <span aria-hidden="true">→</span>
+              </span>
+              <span className="text-body leading-snug text-ink transition-colors group-hover:text-accent">
+                {next.title}
+              </span>
+            </a>
+          </Approach>
         ) : (
           <span className="hidden bg-canvas-raised/40 px-6 py-6 sm:block" />
         )}

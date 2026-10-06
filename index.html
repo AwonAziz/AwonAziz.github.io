@@ -10,16 +10,90 @@
     if (p && ["phosphor","glacier","ember","magenta","violet","lime"].indexOf(p) > -1 && p !== 'phosphor') {
       root.dataset.palette = p;
     }
-    // Suppress every transition for one frame, then allow them. Without this the
-    // first application animates each element's own transition-* and the page
-    // appears to flash.
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { root.classList.add('theme-ready'); });
-    });
+    setTimeout(function () { root.classList.add('theme-ready'); }, 0);
   } catch (e) {
     document.documentElement.classList.add('theme-ready');
   }
 })();</script>
+    <script>
+console.log('[ApproachHandler] script loaded');
+(function () {
+  // Attach state to window so it can be accessed from outside the IIFE
+  window.__approachElements = new Map();
+  window.__approachFrame = 0;
+  window.__approachLastPointer = { x: -99999, y: -99999 };
+
+  function paint() {
+    let anyActive = false;
+    window.__approachElements.forEach((radius, node) => {
+      const rect = node.getBoundingClientRect();
+      const dx = Math.max(0, Math.abs(window.__approachLastPointer.x - (rect.left + rect.width / 2)) - rect.width / 2);
+      const dy = Math.max(0, Math.abs(window.__approachLastPointer.y - (rect.top + rect.height / 2)) - rect.height / 2);
+      const distance = Math.hypot(dx, dy);
+      const proximity = Math.max(0, Math.min(1, 1 - distance / radius));
+      const leaving = proximity < (node._approachValue || 0);
+      const rate = leaving ? 0.35 : 0.18;
+      const value = (node._approachValue || 0) + (proximity - (node._approachValue || 0)) * rate;
+      node._approachValue = value;
+      if (value > 0.001) {
+        node.style.setProperty("--a", value.toFixed(4));
+        anyActive = true;
+      } else {
+        node.style.removeProperty("--a");
+      }
+    });
+    if (!anyActive && window.__approachFrame) {
+      clearInterval(window.__approachFrame);
+      window.__approachFrame = 0;
+    }
+  }
+
+  function onPointerMove(e) {
+    window.__approachLastPointer = { x: e.clientX, y: e.clientY };
+    if (!window.__approachFrame) window.__approachFrame = setInterval(paint, 16);
+  }
+
+  function onPointerLeave() {
+    window.__approachLastPointer = { x: -99999, y: -99999 };
+    if (!window.__approachFrame) window.__approachFrame = setInterval(paint, 16);
+  }
+
+  function register() {
+    document.querySelectorAll('[data-approach-radius]').forEach((node) => {
+      const radius = parseFloat(node.dataset.approachRadius);
+      if (!isNaN(radius) && !window.__approachElements.has(node)) {
+        window.__approachElements.set(node, radius);
+        node._approachValue = 0;
+      }
+    });
+    if (window.__approachElements.size && !window.__approachFrame) {
+      window.__approachFrame = setInterval(paint, 16);
+    }
+  }
+
+  // Expose register globally so it can be called after hydration
+  window.__approachRegister = register;
+
+  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  window.addEventListener("pointerleave", onPointerLeave);
+  window.addEventListener("blur", onPointerLeave);
+
+  // Register immediately (may be empty if React hasn't hydrated yet)
+  register();
+
+  // Fallback: keep trying to register for a few seconds after load,
+  // in case React hydration happens after this script runs.
+  let registerAttempts = 0;
+  const registerInterval = setInterval(() => {
+    register();
+    registerAttempts++;
+    if (registerAttempts >= 20) clearInterval(registerInterval);
+  }, 100);
+
+  // MutationObserver as backup for dynamic content
+  new MutationObserver(register).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -65,12 +139,12 @@
       name="twitter:description"
       content="Drift detection, model promotion, retrieval evaluation, incident triage."
     />
-    <script type="module" crossorigin src="./assets/main-BVC8rSao.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/styles-rSwq4Jsr.js">
+    <script type="module" crossorigin src="./assets/main-7z9ca2Dq.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/styles-4B9zX_0I.js">
     
     <link rel="preload" href="./assets/space-grotesk-latin-var-BhU9QXUp.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/geist-mono-latin-var-XN7g48iV.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" crossorigin href="./assets/styles-DUBBTpYI.css">
+    <link rel="stylesheet" crossorigin href="./assets/styles-CT_tAguR.css">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://awonaziz.github.io/#person","name":"Awon Aziz","jobTitle":"AI / MLOps engineer","description":"AI/MLOps engineer. LoRA fine-tuning on a hand-written autodiff with every layer proved against its reference, drift detection that is calibrated to report no, an evaluation warehouse that fails CI on a stale row, and scheduled automation that has run unattended for weeks.","url":"https://awonaziz.github.io","email":"mailto:awonaziz786@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Islamabad","addressCountry":"PK"},"knowsAbout":["Python","NumPy","PyTorch","peft","ONNX","ONNX Runtime","FastAPI","pytest","DuckDB","SQLAlchemy","Pandas","Pydantic","Streamlit","Plotly","Ollama","qwen3:8b","sentence-transformers","SQLite","Prometheus","Docker","Chroma","CrewAI","Kubernetes","scikit-learn"],"alumniOf":[{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Al Nafi International Colleges"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"Cisco Networking Academy"},{"@type":"EducationalOrganization","name":"IMCB F-8/4, Islamabad"}],"sameAs":["https://github.com/AwonAziz","https://www.linkedin.com/in/awonaziz","https://leetcode.com/AwonAziz","mailto:awonaziz786@gmail.com"]}</script>
   </head>
   <body>

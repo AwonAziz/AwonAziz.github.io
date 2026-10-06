@@ -676,6 +676,105 @@ html:not(.theme-ready) *::after {
 }
 
 /**
+ * ---------------------------------------------------------------------------
+ *  Approach
+ * ---------------------------------------------------------------------------
+ *  The whole visual language of "this reacts to you" lives in this one block,
+ *  driven by a single normalised value that the pointer loop writes onto the
+ *  element: `--a`, from 0 (ignored) to 1 (pointer arrived).
+ *
+ *  Keeping it here rather than in JS props means it can be tuned without a
+ *  rebuild, it is in one place to review, and every approaching element on the
+ *  page is guaranteed to behave identically — which is what makes a repeated
+ *  effect read as a system instead of as a set of one-offs.
+ *
+ *  Only `transform`, `opacity` and `box-shadow` move. `box-shadow` is the right
+ *  choice for the glow specifically because it composites and does not participate
+ *  in layout, so a growing ring cannot shift a neighbour or contribute to CLS.
+ * ---------------------------------------------------------------------------
+ */
+
+/**
+ * Approach — proximity-reactive scale and glow.
+ *
+ * A single `--a` custom property drives both transform and the ring opacity.
+ * The JS loop writes `--a`; CSS handles the transition, pseudo-element ring,
+ * keyboard parity, coarse-pointer fallback, and reduced-motion fallback.
+ */
+.approach {
+  --a: 0;
+  --approach-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+  transform: translate3d(0, 0, 0) scale(calc(1 + var(--a) * 0.05));
+  /* Custom property in timing-function can break the whole transition in some
+     engines. Use the resolved value here; the variable is kept for clarity. */
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* The ring — a pseudo-element behind content, box-shadow so it composites. */
+.approach::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  opacity: calc(var(--a) * 0.9);
+  /* Fallback without color-mix (older browsers) — still respects opacity via the
+     element's opacity property above, but the shadow colour itself is solid. */
+  box-shadow:
+    0 0 0 1px var(--color-accent),
+    0 0 calc(14px + var(--a) * 26px) var(--color-accent);
+}
+
+/* Modern browsers: colour-mix lets the shadow itself fade with --a. */
+@supports (color: color-mix(in lab, red, red)) {
+  .approach::before {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-accent) calc(var(--a) * 70%), transparent),
+      0 0 calc(14px + var(--a) * 26px)
+        color-mix(in oklab, var(--color-accent) calc(var(--a) * 34%), transparent);
+  }
+}
+
+/* Keyboard parity — :focus-visible matches where the browser judges a ring appropriate. */
+.approach:focus-visible {
+  --a: 1;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  forced-color-adjust: none;
+}
+
+/**
+ * Coarse pointers get the plain press, not the ramp.
+ * A press is a compression, so scale to 0.97 (not 1.05).
+ */
+@media (pointer: coarse) {
+  .approach {
+    transform: none;
+  }
+  .approach:active {
+    transform: scale(0.97);
+    transition-duration: 120ms;
+  }
+}
+
+/**
+ * Reduced motion removes the travel and keeps the light.
+ * The scale is dropped; the ring stays (colour change is not motion).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .approach {
+    transform: none !important;
+    transition: none;
+    will-change: auto;
+  }
+}
+
+/**
  * Scroll edge fade.
  *
  * A `mask-image` gradient at a container's top and bottom edges. It dissolves a
